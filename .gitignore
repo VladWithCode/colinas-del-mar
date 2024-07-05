@@ -1,0 +1,9 @@
+# Ignore binaries
+cmd/*
+
+# Keep go files
+!cmd/*.go
+!cmd/**/*.go
+
+# Ignore .env files
+*.env

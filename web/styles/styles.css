@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+    scroll-behavior: smooth;
+    max-width: 100vw;
+    overflow: hidden auto;
+    min-height: 100%;
+}
+
+.page {
+    min-height: calc(100vh - 64px);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    max-width: 100%;
+    overflow: hidden auto;
+}
+
+a[disabled] {
+    pointer-events: none;
+    cursor: default;
+    opacity: .90;
+}
+

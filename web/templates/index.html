@@ -1,0 +1,156 @@
+{{define "content"}}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Video control
+        let videoElem = document.getElementById("hero-video")
+        let videoPlayBtn = document.getElementById("video-play-btn")
+        let videoCaption = document.getElementById("video-caption")
+
+        videoPlayBtn.addEventListener("click", e => {
+            let tl = gsap.timeline({ duration: 0.15, ease: "power2.in" })
+            if (videoElem.paused) {
+                videoElem.play()
+                tl.to(videoCaption, { opacity: 0 })
+                return
+            }
+
+            videoElem.pause()
+            tl.to(videoCaption, { opacity: 1 })
+        })
+
+        // Hero slider
+        let heroPrevBtn = document.getElementById("hero-slider-prev")
+        let heroNextBtn = document.getElementById("hero-slider-next")
+        let heroSlides = document.querySelectorAll("[data-hero-slider-slide]")
+        heroPrevBtn.addEventListener("click", e => {
+            let slideCount = heroSlides.length
+            if (slideCount <= 1) {
+                return
+            }
+            let activeSlide = document.querySelector(".active[data-hero-slider-slide]")
+            let activeIndex = 0
+
+            if (activeSlide) {
+                activeIndex = parseInt(activeSlide.dataset.heroSliderSlide) - 1
+                if (activeIndex < 0) activeIndex = slideCount - 1
+                activeSlide.classList.remove("active")
+            }
+
+            let nextSlide = document.querySelector(`[data-hero-slider-slide="${activeIndex}"]`)
+            nextSlide.classList.add("active")
+
+            let tl = gsap.timeline({ duration: 0.3, ease: "power2.inOut" })
+            tl.set(activeSlide, { zIndex: 0 })
+            tl.set(nextSlide, { zIndex: 10, visibility: "visible" }, "<")
+            tl.to(nextSlide, { opacity: 1 })
+            tl.set(activeSlide, { opacity: 0, visibility: "hidden" })
+
+            if (!videoElem.paused) {
+                videoElem.pause()
+                videoElem.currentTime = 0
+                tl.to(videoCaption, { opacity: 1 })
+            }
+        })
+        heroNextBtn.addEventListener("click", e => {
+            let slideCount = heroSlides.length
+            if (slideCount <= 1) {
+                return
+            }
+            let activeSlide = document.querySelector(".active[data-hero-slider-slide]")
+            let activeIndex = 0
+
+            if (activeSlide) {
+                activeIndex = parseInt(activeSlide.dataset.heroSliderSlide) + 1
+                if (activeIndex >= slideCount) activeIndex = 0
+                activeSlide.classList.remove("active")
+            }
+
+            let nextSlide = document.querySelector(`[data-hero-slider-slide="${activeIndex}"]`)
+            nextSlide.classList.add("active")
+            console.log(activeSlide, nextSlide)
+
+            let tl = gsap.timeline({ duration: 0.3, ease: "power2.inOut" })
+            tl.set(activeSlide, { zIndex: 0 })
+            tl.set(nextSlide, { zIndex: 10, visibility: "visible" }, "<")
+            tl.to(nextSlide, { opacity: 1 })
+            tl.set(activeSlide, { opacity: 0, visibility: "hidden" })
+
+            if (!videoElem.paused) {
+                videoElem.pause()
+                videoElem.currentTime = 0
+                tl.to(videoCaption, { opacity: 1 })
+            }
+        })
+
+        let scrollArrow = document.getElementById("scroll-arrow")
+
+        gsap.to(scrollArrow, { y: "50%", duration: .65, repeat: -1, yoyo: true })
+    })
+</script>
+<div class="relative w-screen h-dvh pt-16 px-4 z-0 overflow-hidden" id="hero-wrapper">
+    <button
+        class="absolute flex items-center justify-center top-1/2 -translate-y-1/2 left-0 w-10 h-10 z-40"
+        id="hero-slider-prev">
+        <svg class="w-5 h-5 stroke-stone-50 rotate-180 md:w-7 md:h-7" style="filter: drop-shadow(0px 5px 12px rgb(0,0,0,1))">
+            <use href="/static/svg/arrow.svg#arrow"></use>
+        </svg>
+    </button>
+    <button
+        class="absolute flex items-center justify-center top-1/2 -translate-y-1/2 right-0 w-10 h-10 z-40"
+        id="hero-slider-next">
+        <svg class="w-5 h-5 stroke-stone-50 md:w-7 md:h-7" style="filter: drop-shadow(0px 5px 12px rgb(0,0,0,1))">
+            <use href="/static/svg/arrow.svg#arrow"></use>
+        </svg>
+    </button>
+    <div class="w-full h-full overflow-hidden" id="hero-content">
+        <figure class="absolute inset-0 z-10 active" data-hero-slider-slide="0">
+            <video 
+                width="1920"
+                height="1080"
+                id="hero-video"
+                src="/static/video/mzt.mp4" 
+                poster="/static/img/hero.jpg"
+                preload="auto"
+                playsinline
+                muted
+                loop
+                class="relative object-center object-cover w-full h-full max-h-full z-0">
+            </video>
+            <figcaption
+                class="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-20 text-stone-50 space-y-8" 
+                style="text-shadow: 0px 5px 10px rgb(0,0,0,.8)"
+                id="video-caption">
+                <h1 class="text-3xl font-semibold uppercase w-[20ch] mx-auto md:text-5xl" style="font-family: 'Crimson Text', serif;">Lotes residenciales en Durango</h1>
+                <div class="space-y-2 md:space-y-4 text-center">
+                    <svg class="block mx-auto h-12 w-12 fill-current" style="filter: drop-shadow(0px 5px 10px rgb(0,0,0,.8))">
+                        <use href="/static/svg/play.svg#play"></use>
+                    </svg>
+                    <span class="block text-xs font-medium uppercase">Reproducir Video</span>
+                </div>
+            </figcaption>
+            <button 
+                type="button"
+                id="video-play-btn"
+                class="absolute inset-0 w-full h-full opacity-0 z-30"></button>
+        </figure>
+        <figure class="absolute inset-0 w-full h-full opacity-0 invisible" data-hero-slider-slide="1">
+            <div class="absolute w-full h-full bg-stone-800 bg-opacity-60 z-10"></div>
+            <img class="relative h-full w-full max-h-full object-center object-cover z-0" src="/static/img/gly-5.png" alt="Residencial slider imagen 1">
+            <figcaption class="absolute flex flex-col top-1/2 -translate-y-1/2 text-stone-50 left-0 right-0 space-y-4 z-20">
+                <h1 class="text-3xl font-semibold uppercase w-[20ch] mx-auto" style="font-family: 'Crimson Text', serif;">Lotes residenciales en Durango</h1>
+                <p class="max-w-[30ch] mx-auto">
+                Lotes desde 200 hasta 520m<sup>2</sup> en una de las zonas más exclusivas
+                de la ciudad de Durango.
+                </p>
+                <a href="#formulario-cita" class="inline-block mx-auto bg-stone-50 text-slate-700 rounded px-6 py-3">Solicitar cotización</a>
+            </figcaption>
+        </figure>
+    </div>
+    <div class="absolute bottom-0 left-0 right-0 z-40">
+        <svg class="w-8 h-8 mx-auto mb-1.5 stroke-stone-50 rotate-90" id="scroll-arrow">
+            <use href="/static/svg/arrow.svg#arrow"></use>
+        </svg>
+    </div>
+</div>
+<div class="h-96"></div>
+{{end}}
