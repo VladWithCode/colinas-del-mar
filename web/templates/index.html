@@ -1,4 +1,22 @@
+{{define "head"}}
+<script src="/static/js/panzoom.js" defer></script>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvAklgESwp2h3fLI2qOOPP9v_Oc34aosM&loading=async&libraries=maps,marker&v=beta" defer>
+</script>
+{{end}}
 {{define "content"}}
+<style>
+.slider .slider-dot {
+    display: block;
+    width: 0.675rem;
+    height: 0.675rem;
+    border-radius: 999px;
+}
+
+.slider .slider-dot.active {
+    background-color: rgb(67, 56, 224);
+}
+</style>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         // Video control
@@ -17,6 +35,11 @@
             videoElem.pause()
             tl.to(videoCaption, { opacity: 1 })
         })
+
+        setTimeout(() => {
+            videoElem.play()
+            gsap.to(videoCaption, { opacity: 0 })
+        }, 100)
 
         // Hero slider
         let heroPrevBtn = document.getElementById("hero-slider-prev")
@@ -67,7 +90,6 @@
 
             let nextSlide = document.querySelector(`[data-hero-slider-slide="${activeIndex}"]`)
             nextSlide.classList.add("active")
-            console.log(activeSlide, nextSlide)
 
             let tl = gsap.timeline({ duration: 0.3, ease: "power2.inOut" })
             tl.set(activeSlide, { zIndex: 0 })
@@ -85,20 +107,200 @@
         let scrollArrow = document.getElementById("scroll-arrow")
 
         gsap.to(scrollArrow, { y: "50%", duration: .65, repeat: -1, yoyo: true })
+
+        // Amenity slider
+        let prevAmenity = document.getElementById('slider-prev-btn');
+        let nextAmenity = document.getElementById('slider-next-btn');
+        let amenitySlider = document.getElementById('slider-container');
+        let dotsContainer = document.getElementById('slider-dots-container');
+        let slides = document.querySelectorAll('[data-slider-slide]');
+
+        for (let slide of slides) {
+            let dot = document.createElement('span');
+            dot.classList.add('slider-dot', 'bg-indigo-900');
+            dot.dataset.sliderDot = slide.dataset.sliderSlide;
+            dot.addEventListener('click', () =>
+                scrollToSlide(parseInt(slide.dataset.sliderSlide))
+            );
+
+            if (dot.dataset.sliderDot === '0') {
+                dot.classList.add('active');
+            }
+
+            dotsContainer.appendChild(dot);
+        }
+        function scrollToSlide(slideIndex) {
+            const slideWidth = slides[0].offsetWidth;
+            amenitySlider.scrollTo({
+                left: slideWidth * slideIndex,
+                behavior: 'smooth',
+            });
+            updateActiveDot(slideIndex);
+        }
+        // Update the active dot
+        function updateActiveDot(activeIndex) {
+            let dots = document.querySelectorAll('[data-slider-dot]');
+
+            for (let dot of dots) {
+                let isActive = activeIndex === parseInt(dot.dataset.sliderDot);
+                dot.classList.toggle('active', isActive);
+            }
+        }
+
+        prevAmenity.addEventListener('click', e => {
+            let activeSlide = document.querySelector(
+                '.active[data-slider-dot]'
+            );
+            let activeIndex = parseInt(activeSlide?.dataset.sliderDot)
+            if (activeIndex <= 0)
+                activeIndex = slides.length - 1
+            else
+                activeIndex = activeIndex - 1
+            scrollToSlide(activeIndex);
+        });
+        nextAmenity.addEventListener('click', e => {
+            let activeSlide = document.querySelector(
+                '.active[data-slider-dot]'
+            );
+            let activeIndex = parseInt(activeSlide?.dataset.sliderDot);
+            if (activeIndex >= slides.length - 1 || isNaN(activeIndex))
+                activeIndex = 0
+            else
+                activeIndex = parseInt(activeIndex) + 1
+            scrollToSlide(activeIndex);
+        });
+
+        let planObject = document.getElementById("plan-object")
+        let zoomInBtn = document.getElementById("plan-zoom-in")
+        let zoomOutBtn = document.getElementById("plan-zoom-out")
+        let pz = Panzoom(planObject, {
+            maxScale: 6,
+            minScale: 1,
+            animate: true,
+        })
+        planObject.addEventListener("load", () => {
+            let planDoc = planObject.contentDocument
+            let lotWrapper = planDoc.getElementById("Lt")
+            let lots = planDoc.querySelectorAll("#Lt>path")
+            let planRect = planObject.getClientRects()[0]
+            let planCenter = [
+                planRect.width * .5,
+                planRect.height * .5,
+            ]
+
+            for (let lot of lots) {
+                lot.addEventListener("mouseover", e => {
+                    lotWrapper.appendChild(lot)
+
+                    let activeLot = planDoc.querySelector(".active-lot")
+                    if (activeLot) {
+                        lotWrapper.appendChild(activeLot)
+                    }
+                })
+                lot.addEventListener("click", e => {
+                    e.stopPropagation()
+                    let rect = lot.getClientRects()[0]
+                    let x = planCenter[0] - rect.x,
+                        y = planCenter[1] - rect.y;
+
+                    pz.zoom(6)
+                    setTimeout(() => {
+                        pz.pan(x, y)
+                    }, 100)
+                    planDoc.getElementById("plan-sat").style.opacity = 0.7
+
+                    for (let l of lots){
+                        let isActive = l === lot
+                        l.classList.toggle("active-lot", isActive)
+                        l.style.display = isActive ? "block" : "none"
+                    }
+                    lotWrapper.appendChild(lot)
+                })
+
+            }
+            planObject.addEventListener("panzoomreset", () => {
+                for (lot of lots) {
+                    lot.classList.remove("active-lot")
+                    lot.style.display = "block"
+                }
+                planDoc.getElementById("plan-sat").style.opacity = 1
+            })
+        })
+        zoomInBtn.addEventListener("click", () => {
+            pz.zoomIn()
+        })
+        zoomOutBtn.addEventListener("click", () => {
+            pz.zoomOut()
+            if (pz.getScale() === 1) {
+                pz.reset()
+            }
+        })
+
+        function parseLotId(id) {
+            let lotData = {
+                mz: "",
+                lt: "",
+            }
+
+            let [mzStr, ltStr] = id.split("_")
+            lotData.mz = mzStr.split("-")[1]
+            lotData.lt = ltStr.split("-")[1]
+
+            return lotData
+        }
+
+        let mainHeading = document.getElementById("main-heading")
+        gsap.fromTo(
+            mainHeading,
+            {
+                y: "-100%",
+                autoAlpha: 0,
+                duration: 1,
+                ease: "power2.inOut",
+            }, 
+            {
+                y: "0%",
+                autoAlpha: 1,
+            }
+        )
+
+        let firstChar = document.querySelector('[data-char-wrapper="0"')
+        let obsChar = new IntersectionObserver((ent, obs) => {
+            let e = ent[0]
+            if (e.isIntersecting) {
+                gsap.fromTo(
+                    "[data-char-wrapper]",
+                    {
+                        autoAlpha: 0,
+                        y: "50%",
+                        ease: "power2.in",
+                    },
+                    {
+                        autoAlpha: 1,
+                        y: "0%",
+                        stagger: .5,
+                        duration: 1
+                    }
+                )
+
+                obs.unobserve(firstChar)
+            }
+        })
+        obsChar.observe(firstChar)
     })
 </script>
-<div class="relative w-screen h-dvh pt-16 px-4 z-0 overflow-hidden" id="hero-wrapper">
+<div class="relative h-dvh pt-16 px-4 z-0 overflow-hidden" id="hero-wrapper">
     <button
-        class="absolute flex items-center justify-center top-1/2 -translate-y-1/2 left-0 w-10 h-10 z-40"
+        class="absolute flex items-center justify-center top-1/2 -translate-y-1/2 left-2 w-10 h-10 bg-slate-700 bg-opacity-60 rounded-sm z-40"
         id="hero-slider-prev">
-        <svg class="w-5 h-5 stroke-stone-50 rotate-180 md:w-7 md:h-7" style="filter: drop-shadow(0px 5px 12px rgb(0,0,0,1))">
+        <svg class="w-5 h-5 stroke-stone-50 rotate-180 md:w-6 md:h-6" style="filter: drop-shadow(0px 5px 12px rgb(0,0,0,1));">
             <use href="/static/svg/arrow.svg#arrow"></use>
         </svg>
     </button>
     <button
-        class="absolute flex items-center justify-center top-1/2 -translate-y-1/2 right-0 w-10 h-10 z-40"
+        class="absolute flex items-center justify-center top-1/2 -translate-y-1/2 right-2 w-10 h-10 bg-slate-700 bg-opacity-60 rounded-sm z-40"
         id="hero-slider-next">
-        <svg class="w-5 h-5 stroke-stone-50 md:w-7 md:h-7" style="filter: drop-shadow(0px 5px 12px rgb(0,0,0,1))">
+        <svg class="w-5 h-5 stroke-stone-50 md:w-6 md:h-6" style="filter: drop-shadow(0px 5px 12px rgb(0,0,0,1))">
             <use href="/static/svg/arrow.svg#arrow"></use>
         </svg>
     </button>
@@ -118,11 +320,10 @@
             </video>
             <figcaption
                 class="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-20 text-stone-50 space-y-8" 
-                style="text-shadow: 0px 5px 10px rgb(0,0,0,.8)"
-                id="video-caption">
-                <h1 class="text-3xl font-semibold uppercase w-[20ch] mx-auto md:text-5xl" style="font-family: 'Crimson Text', serif;">Lotes residenciales en Durango</h1>
-                <div class="space-y-2 md:space-y-4 text-center">
-                    <svg class="block mx-auto h-12 w-12 fill-current" style="filter: drop-shadow(0px 5px 10px rgb(0,0,0,.8))">
+                style="text-shadow: 0px 5px 10px rgb(0,0,0,.8)">
+                <h1 class="text-3xl font-semibold uppercase w-[20ch] mx-auto md:text-5xl md:w-[40ch] md:text-center lg:text-6xl invisible" style="font-family: 'Crimson Text', serif;" id="main-heading">Lotes residenciales <br class="hidden lg:block">en Mazatlán</h1>
+                <div class="space-y-2 md:space-y-4 text-center" id="video-caption">
+                    <svg class="block mx-auto h-12 w-12 fill-current lg:h-10 lg:w-10" style="filter: drop-shadow(0px 5px 10px rgb(0,0,0,.8))">
                         <use href="/static/svg/play.svg#play"></use>
                     </svg>
                     <span class="block text-xs font-medium uppercase">Reproducir Video</span>
@@ -136,13 +337,13 @@
         <figure class="absolute inset-0 w-full h-full opacity-0 invisible" data-hero-slider-slide="1">
             <div class="absolute w-full h-full bg-stone-800 bg-opacity-60 z-10"></div>
             <img class="relative h-full w-full max-h-full object-center object-cover z-0" src="/static/img/gly-5.png" alt="Residencial slider imagen 1">
-            <figcaption class="absolute flex flex-col top-1/2 -translate-y-1/2 text-stone-50 left-0 right-0 space-y-4 z-20">
-                <h1 class="text-3xl font-semibold uppercase w-[20ch] mx-auto" style="font-family: 'Crimson Text', serif;">Lotes residenciales en Durango</h1>
-                <p class="max-w-[30ch] mx-auto">
-                Lotes desde 200 hasta 520m<sup>2</sup> en una de las zonas más exclusivas
-                de la ciudad de Durango.
+            <figcaption class="absolute flex flex-col top-1/2 -translate-y-1/2 text-stone-50 left-0 right-0 space-y-4 z-20 lg:space-y-6">
+                <h1 class="text-3xl font-semibold uppercase w-[20ch] mx-auto md:text-5xl md:w-[40ch] md:text-center lg:text-6xl" style="font-family: 'Crimson Text', serif;">Lotes residenciales <br class="hidden lg:block"/> en Mazatlán</h1>
+                <p class="max-w-[30ch] mx-auto lg:text-lg">
+                Lotes desde 96m<sup>2</sup> hasta 132m<sup>2</sup> en una de las zonas más exclusivas
+                de la ciudad de Mazatlán.
                 </p>
-                <a href="#formulario-cita" class="inline-block mx-auto bg-stone-50 text-slate-700 rounded px-6 py-3">Solicitar cotización</a>
+                <a href="#formulario-cita" class="inline-block mx-auto bg-indigo-700 text-stone-50 rounded px-6 py-3">Solicitar cotización</a>
             </figcaption>
         </figure>
     </div>
@@ -152,5 +353,306 @@
         </svg>
     </div>
 </div>
-<div class="h-96"></div>
+
+<section
+	class="section grid grid-cols-3 grid-rows-[min-content] gap-y-8 gap-x-16 auto-rows-fr relative z-0 p-12 space-y-6 xl:max-w-screen-lg md:mx-auto overflow-y-hidden">
+	<h1
+		class="text-3xl font-extrabold uppercase text-center text-indigo-900 col-span-full">
+		Un residencial para ti y tu familia
+	</h1>
+	<div class="col-span-full space-y-2 text-stone-950 lg:col-span-1 invisible" data-char-wrapper="0">
+		<div class="mx-auto h-12 w-12">
+			<img
+				class="w-full h-full"
+				src="/static/img/fern.png"
+				alt="Fern icon" />
+		</div>
+		<p class="text-lg text-center font-semibold">Areas Verdes</p>
+		<p class="w-[34ch] max-w-full mx-auto">
+			Colinas del mar cuenta con más de 20,000m2 de áreas verdes, para
+			que tú como propietario de un terreno aquí, puedas disfrutar de
+			jardines, amenidades y flora que tendremos disponibles.
+		</p>
+	</div>
+	<div class="col-span-full space-y-2 text-stone-950 lg:col-span-1 invisible" data-char-wrapper="1">
+		<div class="mx-auto h-12 w-12">
+			<svg class="w-full h-full fill-stone-950">
+				<use href="/static/svg/lamppost.svg#lamppost"></use>
+			</svg>
+		</div>
+		<p class="text-lg text-center font-semibold">Servicios</p>
+		<p class="w-[34ch] max-w-full mx-auto">
+			Cableado subterráneo en su totalidad, pavimento hidráulico,
+			tecnología de última generación en alumbrado y equipo de seguridad.
+		</p>
+	</div>
+	<div class="col-span-full space-y-2 text-stone-950 lg:col-span-1 invisible" data-char-wrapper="2">
+		<div class="mx-auto h-12 w-12">
+			<svg class="w-full h-full fill-stone-950">
+				<use href="/static/svg/security.svg#security"></use>
+			</svg>
+		</div>
+		<p class="text-lg text-center font-semibold">Seguridad</p>
+		<p class="w-[34ch] max-w-full mx-auto">
+			Porque tu tranquilidad es prioridad para nosotros, contaremos con
+			circuito cerrado en todo el residencial, una barda perimetral de 3
+			metros con cerca eléctrica y un equipo de seguridad en la caseta con
+			accesos automatizados.
+		</p>
+	</div>
+</section>
+<!-- Availability Plan -->
+<section class="relative z-0 flex flex-col max-w-full  overflow-hidden" id="seccion-plano">
+    <h1 class="text-center text-3xl text-indigo-900 font-extrabold uppercase mb-4 lg:mb-8">Plano de disponibilidad</h1>
+    <div class="w-full flex-auto grid grid-cols-2 grid-rows-2 lg:grid-rows-1 px-4">
+        <!-- Plan -->
+        <div class="relative col-span-full row-start-1 lg:col-span-1 z-0 bg-stone-400 rounded">
+            <object
+                id="plan-object"
+                data="/static/svg/plan.svg"
+                type="image/svg+xml"
+                class="w-full max-h-[80vh] object-center rounded">
+            </object>
+            <div class="absolute bottom-2 right-2">
+                <button class="h-8 w-8 flex items-center justify-center rounded-t bg-stone-200" id="plan-zoom-in">
+                    <svg class="w-4 h-4 fill-stone-400 rotate-45">
+                        <use href="/static/svg/times.svg#times"></use>
+                    </svg>
+                </button>
+                <button class="h-8 w-8 flex items-center justify-center rounded-b bg-stone-200" id="plan-zoom-out">
+                    <svg class="w-8 h-8 stroke-stone-400">
+                        <use href="/static/svg/minus.svg#minus"></use>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="col-span-full row-start-1 lg:col-span-1">
+            <div class="relative opacity-100 px-4">
+                <h2 class="text-xl font-semibold text-slate-700">¿Cómo funciona?</h2>
+                <div class="py-2"></div>
+                <ol class="space-y-4">
+                    <li class="max-w-[50ch]">
+                        <p class="text-slate-700 font-bold">1. Selecciona un lote</p>
+                        <p class="">Da click en el lote que te interese, si está disponible verás la información del mismo.</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="relative z-0 p-10 space-y-6">
+	<!-- TODO: Picture -->
+	<h1 class="text-center text-3xl text-indigo-900 font-extrabold uppercase">
+		Seguridad para tu inversión
+	</h1>
+	<p class="max-w-[80ch] mx-auto">
+		A ti que buscas no solo un residencial para vivir sino una inversión
+		segura, Colinas del Mar es tu opción más rentable del mercado por su
+		valor costo/beneficio. Gracias a la gran ubicación con la que cuenta,
+		con una conectividad inigualable, fluidez vial, zona segura y una serie
+		de amenidades de lujo a las que no puedes resistirte.
+	</p>
+	<div class="shadow-lg shadow-stone-100 space-y-8 p-4">
+		<div class="space-y-4 px-5">
+			<h3 class="text-2xl text-center font-black uppercase">
+				Desde 200 M<sup>2</sup>
+			</h3>
+			<p class="max-w-[80ch] text-center mx-auto">
+                Nuestros lotes promedio son de 96m<sup>2</sup>, sin embargo, contamos con
+				lotes hasta de 200m<sup>2</sup> para desarrollar lo que tengas en mente y
+				el que espacio se adapte a tu proyecto.
+			</p>
+		</div>
+		<div class="space-y-4 px-5">
+			<h3 class="text-2xl text-center font-black uppercase">
+				Avance de Obra
+			</h3>
+			<p class="max-w-[80ch] text-center mx-auto">
+				Entendemos lo importante que es para ti visualizar
+				constantemente como va la obra, de tal modo
+				que nos comprometemos contigo para irte dando tranquilidad y
+				confianza.
+			</p>
+		</div>
+	</div>
+</section>
+<section
+	class="section section-img-bg relative z-0 p-10 py-20 space-y-6 text-stone-50 lg:space-y-10"
+    style="background: rgb(2, 0, 36); background: linear-gradient(90deg, rgb(2,0,36,0.65) 0%, rgb(2,0,36,0.65) 100%), url('/static/img/gly-4.png') no-repeat; background-size: cover; background-position: center;"
+	data-bg-src="">
+	<h1 class="relative text-3xl text-center font-extrabold uppercase z-0">
+		Perfecto para ti y tu familia
+	</h1>
+	<p class="max-w-[80ch] text-center font-semibold mx-auto">
+		DISFRUTA día a dia con tu FAMILIA y AMIGOS de amenidades que te haran
+		sentir de VACACIONES
+	</p>
+	<div class="w-3/4 mx-auto max-w-96">
+		<a
+			href="#formulario-cita"
+			class="block mx-auto bg-stone-50 text-blue-700 text-center rounded px-6 py-3"
+			>Solicitar cotización</a
+		>
+	</div>
+</section>
+<section class="relative z-0 space-y-6 py-12">
+	<h1
+		class="text-center text-3xl text-indigo-900 font-extrabold px-10 uppercase">
+		Amenidades
+	</h1>
+	<p class="px-10">
+		DISFRUTA día a día con tu FAMILIA Y AMIGOS de amenidades que te harán
+		sentir de VACACIONES.
+	</p>
+	<div class="relative h-80 slider">
+		<div
+			class="h-full flex items-center max-w-full overflow-auto snap-x snap-mandatory"
+			id="slider-container">
+			<div
+				class="flex flex-col items-center justify-center shrink-0 basis-full space-y-4 snap-center xl:basis-1/3 xl:shrink xl:grow-0"
+				data-slider-slide="0">
+				<div class="flex w-32 h-32 bg-indigo-900 rounded-full">
+					<svg class="w-20 h-20 fill-stone-50 m-auto">
+						<use href="/static/svg/greens.svg#greens"></use>
+					</svg>
+				</div>
+				<p class="text-xl font-bold text-indigo-900">Areas Verdes</p>
+			</div>
+			<div
+				class="flex flex-col items-center justify-center shrink-0 basis-full space-y-4 snap-center xl:basis-1/3 xl:shrink xl:grow-0"
+				data-slider-slide="1">
+				<div class="flex w-32 h-32 bg-indigo-900 rounded-full">
+					<svg class="w-20 h-20 fill-stone-50 m-auto">
+						<use href="/static/svg/greens.svg#greens"></use>
+					</svg>
+				</div>
+				<p class="text-xl font-bold text-indigo-900">Gymnasio</p>
+			</div>
+			<div
+				class="flex flex-col items-center justify-center shrink-0 basis-full space-y-4 snap-center xl:basis-1/3 xl:shrink xl:grow-0"
+				data-slider-slide="2">
+				<div class="flex w-32 h-32 bg-indigo-900 rounded-full">
+					<svg class="w-20 h-20 fill-stone-50 m-auto">
+						<use href="/static/svg/greens.svg#greens"></use>
+					</svg>
+				</div>
+				<p class="text-xl font-bold text-indigo-900">Casa Club</p>
+			</div>
+		</div>
+		<div
+			class="absolute top-1/2 left-2 -translate-y-1/2 p-2 bg-indigo-900 rounded-full pr-2"
+			id="slider-prev-btn">
+			<svg class="w-6 h-6 stroke-stone-50 p-0.5 rotate-180">
+				<use href="/static/svg/arrow.svg#arrow"></use>
+			</svg>
+		</div>
+		<div
+			class="absolute top-1/2 right-2 -translate-y-1/2 p-2 bg-indigo-900 rounded-full pl-2"
+			id="slider-next-btn">
+			<svg class="w-6 h-6 stroke-stone-50 p-0.5">
+				<use href="/static/svg/arrow.svg#arrow"></use>
+			</svg>
+		</div>
+		<div
+			class="absolute flex gap-2 bottom-2 left-1/2 -translate-x-1/2 h-2"
+			id="slider-dots-container"></div>
+	</div>
+</section>
+<section class="relative z-0" id="seccion-ubicacion">
+    <div class="absolute -top-8 right-8 z-10 bg-indigo-950 text-stone-50 py-8 px-10 rounded">
+        <h1 class="text-center text-3xl font-extrabold px-10 uppercase">
+            Ubicados<br>
+            A 30 Minutos de la Playa
+        </h1>
+        <div class="py-2"></div>
+        <p class="w-[52ch] text-center font-light mx-auto">
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolorum dicta voluptatem quia voluptate assumenda.
+        </p>
+    </div>
+    <iframe
+        src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1833.8019851057657!2d-106.33375646135268!3d23.184649994765174!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjPCsDExJzA0LjciTiAxMDbCsDE5JzU2LjkiVw!5e0!3m2!1ses-419!2smx!4v1723269366816!5m2!1ses-419!2smx"
+        width="800"
+        height="500"
+        style="width:100vw;max-height:70vh;border:0;"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+</section>
+<section class="relative px-4 pt-8 pb-24 z-0 space-y-8"/>
+	<div class="absolute inset-0 -z-10">
+		<img
+			class="absolute h-full w-auto xl:h-full xl:w-full object-center object-cover z-0"
+			src="/static/img/office-bg.jpg"
+			alt="Fondo oficinas" />
+		<div class="absolute inset-0 bg-stone-900 bg-opacity-60"></div>
+	</div>
+	<h1 class="text-center text-3xl text-stone-50 font-extrabold uppercase" id="offc-heading">
+		Oficinas
+	</h1>
+	<div
+		class="bg-indigo-900 rounded space-y-4 p-4 text-stone-50 md:max-w-lg md:mx-auto"
+        id="offc-box">
+		<div class="flex items-center gap-6 pl-6 pr-4">
+			<div class="">
+				<svg
+					class="w-6 h-auto"
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 36 46">
+					<path
+						id="location-svg-path"
+						d="M24,47S6,37.583,6,19a18,18,0,0,1,36,0C42,37.583,24,47,24,47ZM24,3A16.019,16.019,0,0,0,8,19C8,33.758,20.462,42.5,24,44.687,27.547,42.51,40,33.805,40,19A16.019,16.019,0,0,0,24,3Zm0,25a9,9,0,1,1,9-9A9,9,0,0,1,24,28Zm0-16a7,7,0,1,0,7,7A7,7,0,0,0,24,12Z"
+						transform="translate(-6 -1)"
+						fill="#fff"
+						fill-rule="evenodd"></path>
+				</svg>
+			</div>
+			<p class="">
+				Gral. Anaya 101, Juan de la Barrera, 34150 Durango, Dgo.
+			</p>
+		</div>
+		<div class="flex items-center gap-6 pl-6 pr-4">
+			<div class="">
+				<svg
+					class="w-6 h-auto"
+					xmlns="http://www.w3.org/2000/svg"
+					id="svg-telephone"
+					data-name="svg-telephone"
+					viewBox="0 0 44 44">
+					<path
+						id="tel-path"
+						d="M60.1,62.3h0A26.133,26.133,0,0,1,34,36.2a9.947,9.947,0,0,1,8.663-9.844,2.554,2.554,0,0,1,2.686,1.552l3.69,8.611a2.567,2.567,0,0,1-.2,2.408l-3.077,4.68a.367.367,0,0,0-.019.352A14.317,14.317,0,0,0,52.4,50.592c.225.032.3.011.357-.03l4.6-3.073a2.583,2.583,0,0,1,2.452-.222l8.6,3.692a2.557,2.557,0,0,1,1.541,2.68A9.948,9.948,0,0,1,60.1,62.3ZM42.991,28.541A7.743,7.743,0,0,0,36.206,36.2,23.924,23.924,0,0,0,60.1,60.1a7.738,7.738,0,0,0,7.656-6.739.35.35,0,0,0-.212-.367l-8.614-3.7c-.217-.032-.285-.011-.343.028l-4.6,3.074a2.56,2.56,0,0,1-1.436.438h0a2.59,2.59,0,0,1-1.1-.248,16.54,16.54,0,0,1-7.69-7.667A2.592,2.592,0,0,1,43.92,42.4l3.074-4.676a.362.362,0,0,0,.02-.333l-3.7-8.626A.352.352,0,0,0,42.991,28.541Z"
+						transform="translate(-29.314 -22.706)"
+						fill="#fff"></path>
+				</svg>
+			</div>
+			<p class="">6181941145</p>
+		</div>
+		<div class="flex items-center gap-6 pl-6 pr-4">
+			<div class="">
+				<svg class="w-6 h-6 fill-current">
+					<use href="/static/svg/envelope.svg#envelope"></use>
+				</svg>
+			</div>
+			<p class="">colinas@sibradgo.com.mx</p>
+		</div>
+		<div class="flex items-center gap-6 pl-6 pr-4">
+			<div class="">
+				<svg class="w-6 h-6 fill-current">
+					<use href="/static/svg/clock.svg#clock"></use>
+				</svg>
+			</div>
+			<p class="flex flex-col">Horario de 9am a 2pm y de 4pm a 7pm.</p>
+		</div>
+		<div class="space-y-2 px-4">
+			<a
+				href="#formulario-contacto"
+				class="block mx-auto bg-stone-50 text-blue-700 text-center rounded px-6 py-3"
+				>Contactanos</a
+			>
+		</div>
+	</div>
+</section>
 {{end}}

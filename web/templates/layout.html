@@ -32,13 +32,11 @@
             let logo = document.getElementById("header-logo")
             let navToggler = document.getElementById("nav-toggler")
             let navMenu = document.getElementById("nav-menu")
+            let navMenuDesk = document.getElementById("nav-menu-desktop")
             let navCta = document.getElementById("nav-cta")
             let menuHeight = navMenu.scrollHeight
             let wrapperHeight = header.scrollHeight
             let isFixed = false
-
-            gsap.to(logo, { y: "0%", fill: colorLight, opacity: 1, duration: .65, ease: "power2.out" })
-            gsap.to([navToggler, navCta], { x: "0%", opacity: 1 }, "<0.15")
 
             navToggler.addEventListener("click", e => {
                 let isOpen = header.dataset.navWrapper === "open"
@@ -49,9 +47,10 @@
 
                     if (!isFixed) {
                         tl.to(header, { background: "transparent" })
-                        tl.to(navToggler, { color: colorLight }, "<")
+                        tl.to([navToggler, navMenuDesk], { color: colorLight }, "<")
                         tl.to(logo, { fill: colorLight }, "<")
                     }
+                    tl.to(header, { overflow: "invisible" })
                     tl.to(navMenu, { height: `0px`, opacity: 0 }, "<")
 
                     return
@@ -60,9 +59,10 @@
                 header.dataset.navWrapper = "open"
                 if (!isFixed) {
                     tl.to(header, { background: colorLight })
-                    tl.to(navToggler, { color: colorDark }, "<")
+                    tl.to([navToggler, navMenuDesk], { color: colorDark }, "<")
                     tl.to(logo, { fill: colorDark }, "<")
                 }
+                tl.to(header, { overflow: "visible" })
                 tl.to(navMenu, { height: `${menuHeight}px`, opacity: 1 }, "<")
             })
 
@@ -74,7 +74,7 @@
                 if (target.isIntersecting) {
                     isFixed = false
                     tl.fromTo(header, { y: "-100%" }, { position: "absolute", y: "0%", background: "transparent", boxShadow: "0px 0px 0px rgba(0, 0, 0, 0)" })
-                    tl.to(navToggler, { color: colorLight }, "<")
+                    tl.to([navToggler, navMenuDesk], { color: colorLight }, "<")
                     tl.to(logo, { fill: colorLight }, "<")
 
                     return 
@@ -83,7 +83,7 @@
                 isFixed = true
                 tl.set(header, { y: "-100%" })
                 tl.to(header, { position: "fixed", y: "0%", background: colorLight, boxShadow: "0px 3px 5px -2px #a2a89e" })
-                tl.to(navToggler, { color: colorDark }, "<")
+                tl.to([navToggler, navMenuDesk], { color: colorDark }, "<")
                 tl.to(logo, { fill: colorDark }, "<")
             }, { threshold: 0.2 })
 
@@ -92,11 +92,11 @@
     </script>
     <div class="absolute top-0 left-0 right-0 h-40 bg-transparent opacity-0 pointer-events-none" id="observer-trigger"></div>
     <header
-        class="absolute top-0 left-0 right-0 grid grid-cols-3 grid-rows-1 items-center content-center h-20 text-stone-50 bg-transparent px-4 z-30 md:h-32 overflow-x-hidden shadow-none"
+        class="absolute top-0 left-0 right-0 grid grid-cols-3 grid-rows-1 items-center content-center h-20 text-stone-50 bg-transparent px-4 z-30 overflow-x-hidden shadow-none w-screen lg:grid-cols-[1fr_12rem_1fr]"
         data-nav-wrapper="closed"
         id="header">
         <div
-            class="row-start-1 col-start-1 w-8 aspect-square flex flex-col justify-evenly items-end text-stone-50 -translate-x-full opacity-0"
+            class="row-start-1 col-start-1 w-8 aspect-square flex flex-col justify-evenly items-end text-stone-50 lg:hidden"
             id="nav-toggler"
             data-nav-toggle="false">
             <span class="bg-current rounded-full h-[5px] w-full"></span>
@@ -104,14 +104,32 @@
             <span class="bg-current rounded-full h-[5px] w-4/5"></span>
         </div>
 
-        <div class="col-start-2 max-h-full overflow-hidden">
-            <svg class="w-16 h-16 mx-auto fill-current xl:w-20 xl:h-20 translate-y-full opacity-100" id="header-logo">
+        <ul class="hidden col-start-1 row-start-1 lg:flex gap-4 justify-self-end text-stone-50" id="nav-menu-desktop">
+            <li class="font-semibold">
+                <a href="#seccion-ubicacion">Ubicacion</a>
+            </li>
+            <li class="font-semibold">
+                <a href="#formulario-contacto">Contacto</a>
+            </li>
+            <li class="font-semibold">
+                <a href="#seccion-plano">Plano</a>
+            </li>
+            <li class="font-semibold">
+                <a href="/">Inicio</a>
+            </li>
+        </ul>
+
+        <div class="col-start-2 flex h-full aspect-square overflow-hidden mx-auto">
+            <svg class="w-16 h-16 m-auto fill-current" id="header-logo">
                 <use href="/static/svg/logo.svg#logo"></use>
             </svg>
         </div>
 
-        <div class="row-start-1 col-start-3 justify-self-end">
-            <a href="#formulario-cita" class="block px-4 py-2 bg-indigo-900 rounded-sm text-stone-50 text-xs text-center font-medium tracking-wide uppercase translate-x-full opacity-0" id="nav-cta">Agendar Cita</a>
+        <div class="row-start-1 col-start-3 justify-self-end lg:justify-self-start">
+            <a 
+                href="#formulario-contacto"
+                class="block px-4 py-2 bg-orange-500 rounded-sm text-stone-50 text-xs text-center font-medium tracking-wide uppercase"
+                id="nav-cta">Agendar Cita</a>
         </div>
 
         <div class="fixed top-20 left-0 right-0 bg-stone-50 z-0 h-0 opacity-0 overflow-hidden md:top-32" id="nav-menu" data-nav-menu="">
@@ -120,16 +138,16 @@
                     <a href="/" class="">Inicio</a>
                 </li>
                 <li class="py-2 px-4 border-stone-400 border-b">
+                    <a href="/" class="">Plano</a>
+                </li>
+                <li class="py-2 px-4 border-stone-400 border-b">
                     <a href="/" class="">Avance de Obra</a>
                 </li>
                 <li class="py-2 px-4 border-stone-400 border-b">
-                    <a href="/" class="">Link</a>
-                </li>
-                <li class="py-2 px-4 border-stone-400 border-b">
-                    <a href="/" class="">Link</a>
+                    <a href="/" class="">Contacto</a>
                 </li>
                 <li class="py-2 px-4">
-                    <a href="/" class="">Link</a>
+                    <a href="/" class="">Más Proyectos</a>
                 </li>
             </ul>
         </div>
@@ -139,6 +157,103 @@
     {{template "content" .}}
 
     {{block "footer" .}}
+    <footer class="bg-indigo-950 px-4 py-8 pb-12">
+        <div class="space-y-4 mx-auto xl:max-w-screen-xl xl:flex xl:space-y-0 gap-4">
+            <div class="flex flex-col basis-1/4 shrink grow-0 pt-2 col-start-1">
+                <img src="/static/img/colinas_logo.png" alt="Logo de Sibra Durango" class="w-full object-center mx-auto px-8 pb-4">
+                <p class="w-[28ch] text-stone-100 text-lg font-light py-2 mx-auto">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Soluta tenetur dolor eos sunt sapiente quisquam quidem ducimus voluptate in eum.</p>
+            </div>
+            <div class="basis-1/4 shrink grow px-6">
+                <h2 class="text-xl text-stone-50 font-bold pb-4 uppercase">Menú</h2>
+                <ul class="space-y-2 text-lg font-light text-stone-50">
+                    <li class="">
+                        <a href="/" class="">Inicio</a>
+                    </li>
+                    <li class="">
+                        <a href="/" class="">Plano</a>
+                    </li>
+                    <li class="">
+                        <a href="/" class="">Contacto</a>
+                    </li>
+                    <li class="">
+                        <a href="/" class="">Galería</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="space-y-4 basis-2/3 shrink grow-0">
+                <h2 class="text-xl text-stone-50 font-bold uppercase text-center">¡Contactanos!</h2>
+                <form
+                    id="formulario-contacto"
+                    hx-post="/api/contact"
+                    hx-swap="outerHTML"
+                    class="space-y-4">
+                    <div class="text-sm text-stone-50 space-y-1">
+                        <label class="px-1" for="name">Nombre</label>
+                        <input type="text" id="name" name="name" class="block w-full text-stone-900 bg-stone-50 rounded px-2 py-1 text-lg" placeholder="Juan Perez">
+                    </div>
+                    <div class="text-sm text-stone-50 space-y-1">
+                        <label class="px-1" for="phone">Teléfono</label>
+                        <input type="tel" id="phone" name="phone" class="block w-full text-stone-900 bg-stone-50 rounded px-2 py-1 text-lg" placeholder="6181234455">
+                    </div>
+                    <div class="text-stone-50 space-x-1">
+                        <input type="checkbox" name="consent" id="consent">
+                        <label for="consent" class="text-sm">Acepto que se me contacte a través de Whatsapp o llamada teléfonica</label>
+                    </div>
+                    <div class="pt-4">
+                        <button class="w-full text-xl font-semibold bg-orange-500 text-stone-50 rounded px-4 py-3 uppercase">Enviar</button>
+                    </div>
+                </form>
+            </div>
+            <div class="space-y-4 basis-1/4 shrink-0 grow-0 xl:px-4">
+                <h2 class="text-xl font-bold text-stone-50 uppercase">Comunicate</h2>
+                <ul class="space-y-4 text-stone-50 text-lg">
+                    <li class="flex gap-5">
+                        <svg class="w-12 h-12 my-auto fill-stone-50">
+                            <use href="/static/svg/whatsapp.svg#whatsapp"></use>
+                        </svg>
+                        <div class="">
+                            <strong>Por Whatsapp</strong>
+                            <div>618-123-4455</div>
+                        </div>
+                    </li>
+                    <li class="flex gap-5">
+                        <svg class="w-12 h-12 my-auto fill-stone-50">
+                            <use href="/static/svg/sprites.svg#phone"></use>
+                        </svg>
+                        <div class="">
+                            <strong>Por llamada</strong>
+                            <div>618-123-4455</div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="flex gap-4 flex-wrap items-center text-stone-300 pt-2">
+                    <li class="text-center">
+                        <a href="https://facebook.com/sibra" class="hover:text-[#4267B2]">
+                            <svg class="w-6 h-6 fill-current">
+                                <use href="/static/svg/fb.svg#fb"></use>
+                            </svg>
+                        </a>
+                    </li>
+                    <li class="text-center">
+                        <a href="https://instagram.com/sibra" class="hover:text-[#E1306C]">
+                            <svg class="w-6 h-6 fill-current">
+                                <use href="/static/svg/sprites.svg#instagram"></use>
+                            </svg>
+                        </a>
+                    </li>
+                    <li class="text-center">
+                        <a href="https://x.com/sibra" class="hover:text-[#F5F8FA]">
+                            <svg class="w-6 h-6 fill-current">
+                                <use href="/static/svg/x.svg#x"></use>
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    <div class="h-4 bg-slate-700">
+    </div>
     {{end}}
 </body>
 </html>
