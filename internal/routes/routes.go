@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 )
@@ -24,9 +25,11 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 	templ, err := template.New("layout.html").ParseFiles(
 		"web/templates/layout.html",
 		"web/templates/index.html",
+		"web/templates/sections/gallery.html",
 	)
 
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		RespondWithError(w, 500, ErrorParams{})
 		return
 	}
@@ -34,6 +37,7 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 	err = templ.Execute(w, nil)
 
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		RespondWithError(w, 500, ErrorParams{})
 	}
 }

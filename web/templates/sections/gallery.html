@@ -1,0 +1,83 @@
+{{define "gallery"}}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const picDir = "/static/img"
+        let pics = document.querySelectorAll("[data-gallery-pic]")
+        let mainPic = document.querySelector('[data-gallery-main-pic="current"]')
+        let bgPic = document.getElementById("gallery-bg-pic")
+
+        let galTl = gsap.timeline({ duration: .7, ease: "power2.in" })
+        galTl.from("[data-gallery-bg-backdrop]", { opacity: 0, autoAlpha: 0 })
+        galTl.from(bgPic, { filter: "blur(0px)" }, "<0.3")
+        galTl.from("#gallery-main-container", { x: "-50%", autoAlpha: 0 }, "<0.25")
+        galTl.from(pics, { y: "50%", autoAlpha: 0, stagger: 0.2 }, "<")
+        galTl.pause()
+
+        let galleryObsv = new IntersectionObserver((ents, obsv) => {
+            let target = ents[0]
+
+            if (target.isIntersecting) {
+                galTl.play()
+
+                obsv.unobserve(document.getElementById("gallery-content"))
+            }
+        })
+
+        galleryObsv.observe(document.getElementById("gallery-content"))
+
+        for (let pic of pics) {
+            pic.addEventListener("click", e => {
+                let tl = gsap.timeline({ duration: .4 })
+                let picName = pic.src.split("/").at(-1)
+                let nextMain = document.querySelector('[data-gallery-main-pic="next"]')
+
+                if (picName == mainPic.dataset.galleryCurrentPic) {
+                    return
+                }
+
+                tl.to(mainPic, { x: "100%", opacity: 0 })
+                
+                nextMain.src = picDir + "/" + picName
+
+                tl.to(nextMain, { x: "0%", autoAlpha: 1 }, "<.25")
+
+                nextMain.dataset.galleryMainPic = "current"
+                mainPic.dataset.galleryMainPic = "next"
+                mainPic = nextMain
+                mainPic.dataset.galleryCurrentPic = picName
+                tl.set('[data-gallery-main-pic="next"]', { x: "-100%", autoAlpha: 0 })
+            })
+        }
+    })
+</script>
+<section class="relative z-0 pt-8">
+    <h1 class="text-center text-3xl text-indigo-900 font-extrabold px-10 uppercase">Galería</h1>
+    <p class="max-w-[52ch] text-center mx-auto">Nos enorgullece mostrarte como se ve el proyecto en el que estamos trabajando para ti.</p>
+    <div class="py-4"></div>
+    <div class="relative w-screen overflow-hidden py-16" id="gallery-content">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 z-10 bg-indigo-950 opacity-60 invisible" data-gallery-bg-backdrop></div>
+            <img
+                class="absolute inset-0 w-full aspect-video object-cover object-center z-0 blur-sm"
+                src="/static/img/land-1.jpg"
+                alt="Imagen del progreso actual de Colinas del Mar" 
+                id="gallery-bg-pic">
+        </div>
+
+        <div class="relative flex gap-2 max-w-screen-2xl mx-auto z-20">
+            <div class="relative grid basis-3/5 grow shrink-0 overflow-hidden invisible" id="gallery-main-container">
+                <img data-gallery-main-pic="current" data-gallery-current-pic="land-1.jpg" src="/static/img/land-1.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="col-start-1 row-start-1 w-full aspect-video rounded object-cover object-center">
+                <img data-gallery-main-pic="next" data-gallery-current-pic="land-1.jpg" src="/static/img/land-1.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="col-start-1 row-start-1 w-full aspect-video rounded object-cover object-center -translate-x-full invisible">
+            </div>        
+            <div class="grid grid-cols-3 auto-rows-min gap-2 basis-2/5 shrink grow-0 items-center" id="gallery-pics-container">
+                <img src="/static/img/land-1.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="w-full aspect-video rounded brightness-90 object-cover object-center cursor-pointer invisible hover:brightness-100 hover:scale-105" data-gallery-pic="0">
+                <img src="/static/img/land-2.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="w-full aspect-video rounded brightness-90 object-cover object-center cursor-pointer invisible hover:brightness-100 hover:scale-105" data-gallery-pic="1">
+                <img src="/static/img/land-3.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="w-full aspect-video rounded brightness-90 object-cover object-center cursor-pointer invisible hover:brightness-100 hover:scale-105" data-gallery-pic="2">
+                <img src="/static/img/land-4.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="w-full aspect-video rounded brightness-90 object-cover object-center cursor-pointer invisible hover:brightness-100 hover:scale-105" data-gallery-pic="3">
+                <img src="/static/img/land-5.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="w-full aspect-video rounded brightness-90 object-cover object-center cursor-pointer invisible hover:brightness-100 hover:scale-105" data-gallery-pic="4">
+                <img src="/static/img/land-6.jpg" alt="Imagen del progreso actual de Colinas del Mar" class="w-full aspect-video rounded brightness-90 object-cover object-center cursor-pointer invisible hover:brightness-100 hover:scale-105" data-gallery-pic="5">
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}
