@@ -1,0 +1,130 @@
+{{define "amenities"}}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        let prevAmenity = document.getElementById('slider-prev-btn');
+        let nextAmenity = document.getElementById('slider-next-btn');
+        let amenitySlider = document.getElementById('slider-container');
+        let dotsContainer = document.getElementById('slider-dots-container');
+        let slidesContainer = document.getElementById('slider-container');
+        let slides = document.querySelectorAll('[data-slider-slide]');
+
+        for (let slide of slides) {
+            let dot = document.createElement('span');
+            dot.classList.add('slider-dot', 'bg-indigo-900');
+            dot.dataset.sliderDot = slide.dataset.sliderSlide;
+            dot.addEventListener('click', () =>
+                scrollToSlide(parseInt(slide.dataset.sliderSlide))
+            );
+
+            if (dot.dataset.sliderDot === '0') {
+                dot.classList.add('active');
+            }
+
+            dotsContainer.appendChild(dot);
+        }
+
+        function scrollToSlide(slideIndex) {
+            const slideWidth = slides[0].offsetWidth;
+            amenitySlider.scrollTo({
+                left: slideWidth * slideIndex,
+                behavior: 'smooth',
+            });
+            updateActiveDot(slideIndex);
+        }
+        function updateActiveDot(activeIndex) {
+            let dots = document.querySelectorAll('[data-slider-dot]');
+
+            for (let dot of dots) {
+                let isActive = activeIndex === parseInt(dot.dataset.sliderDot);
+                dot.classList.toggle('active', isActive);
+            }
+        }
+
+        prevAmenity.addEventListener('click', e => {
+            let activeSlide = document.querySelector(
+                '.active[data-slider-dot]'
+            );
+            let activeIndex = parseInt(activeSlide?.dataset.sliderDot)
+            if (activeIndex <= 0)
+                activeIndex = slides.length - 1
+            else
+                activeIndex = activeIndex - 1
+            scrollToSlide(activeIndex);
+        });
+        nextAmenity.addEventListener('click', e => {
+            let activeSlide = document.querySelector(
+                '.active[data-slider-dot]'
+            );
+            let activeIndex = parseInt(activeSlide?.dataset.sliderDot);
+            if (activeIndex >= slides.length - 1 || isNaN(activeIndex))
+                activeIndex = 0
+            else
+                activeIndex = parseInt(activeIndex) + 1
+            scrollToSlide(activeIndex);
+        });
+    })
+</script>
+<section class="relative z-0 space-y-6 py-12">
+	<h1
+		class="text-center text-3xl text-indigo-900 font-extrabold px-10 uppercase">
+		Amenidades
+	</h1>
+	<p class="w-[50ch] mx-auto px-10">
+		DISFRUTA día a día con tu FAMILIA Y AMIGOS de amenidades que te harán
+		sentir de VACACIONES.
+	</p>
+	<div class="relative h-80 slider">
+		<div
+			class="h-full flex items-center max-w-full overflow-auto snap-x snap-mandatory"
+			id="slider-container">
+			<div
+				class="flex flex-col items-center justify-center shrink-0 basis-full space-y-4 snap-center xl:basis-1/3 xl:grow-0"
+				data-slider-slide="0">
+				<div class="flex w-32 h-32 bg-indigo-900 rounded-full">
+					<svg class="w-20 h-20 fill-stone-50 m-auto">
+						<use href="/static/svg/greens.svg#greens"></use>
+					</svg>
+				</div>
+				<p class="text-xl font-bold text-indigo-900">Areas Verdes</p>
+			</div>
+			<div
+				class="flex flex-col items-center justify-center shrink-0 basis-full space-y-4 snap-center xl:basis-1/3 xl:grow-0"
+				data-slider-slide="1">
+				<div class="flex w-32 h-32 bg-indigo-900 rounded-full">
+					<svg class="w-20 h-20 fill-stone-50 m-auto">
+						<use href="/static/svg/greens.svg#greens"></use>
+					</svg>
+				</div>
+				<p class="text-xl font-bold text-indigo-900">Gymnasio</p>
+			</div>
+			<div
+				class="flex flex-col items-center justify-center shrink-0 basis-full space-y-4 snap-center xl:basis-1/3 xl:grow-0"
+				data-slider-slide="2">
+				<div class="flex w-32 h-32 bg-indigo-900 rounded-full">
+					<svg class="w-20 h-20 fill-stone-50 m-auto">
+						<use href="/static/svg/greens.svg#greens"></use>
+					</svg>
+				</div>
+				<p class="text-xl font-bold text-indigo-900">Casa Club</p>
+			</div>
+		</div>
+		<div
+			class="absolute top-1/2 left-2 -translate-y-1/2 p-2 bg-indigo-900 rounded-full pr-2"
+			id="slider-prev-btn">
+			<svg class="w-6 h-6 stroke-stone-50 p-0.5 rotate-180">
+				<use href="/static/svg/arrow.svg#arrow"></use>
+			</svg>
+		</div>
+		<div
+			class="absolute top-1/2 right-2 -translate-y-1/2 p-2 bg-indigo-900 rounded-full pl-2"
+			id="slider-next-btn">
+			<svg class="w-6 h-6 stroke-stone-50 p-0.5">
+				<use href="/static/svg/arrow.svg#arrow"></use>
+			</svg>
+		</div>
+		<div
+			class="absolute flex gap-2 bottom-2 left-1/2 -translate-x-1/2 h-2"
+			id="slider-dots-container"></div>
+	</div>
+</section>
+{{end}}

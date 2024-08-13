@@ -1,0 +1,130 @@
+{{define "plan"}}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        let planObject = document.getElementById("plan-object")
+        let zoomInBtn = document.getElementById("plan-zoom-in")
+        let zoomOutBtn = document.getElementById("plan-zoom-out")
+        let pz = Panzoom(planObject, {
+            maxScale: 6,
+            minScale: 1,
+            animate: true,
+        })
+        planObject.addEventListener("load", () => {
+            let planDoc = planObject.contentDocument
+            let lotWrapper = planDoc.getElementById("Lt")
+            let lots = planDoc.querySelectorAll("#Lt>path")
+            let planRect = planObject.getClientRects()[0]
+            let planCenter = [
+                planRect.width * .5,
+                planRect.height * .5,
+            ]
+
+            for (let lot of lots) {
+                lot.addEventListener("mouseover", e => {
+                    lotWrapper.appendChild(lot)
+
+                    let activeLot = planDoc.querySelector(".active-lot")
+                    if (activeLot) {
+                        lotWrapper.appendChild(activeLot)
+                    }
+                })
+                lot.addEventListener("click", e => {
+                    e.stopPropagation()
+                    let rect = lot.getClientRects()[0]
+                    let x = planCenter[0] - rect.x,
+                        y = planCenter[1] - rect.y;
+
+                    pz.zoom(6)
+                    setTimeout(() => {
+                        pz.pan(x, y)
+                    }, 100)
+                    planDoc.getElementById("plan-sat").style.opacity = 0.7
+
+                    for (let l of lots){
+                        let isActive = l === lot
+                        l.classList.toggle("active-lot", isActive)
+                        l.style.display = isActive ? "block" : "none"
+                    }
+                    lotWrapper.appendChild(lot)
+                })
+
+            }
+            planObject.addEventListener("panzoomreset", () => {
+                for (lot of lots) {
+                    lot.classList.remove("active-lot")
+                    lot.style.display = "block"
+                }
+                planDoc.getElementById("plan-sat").style.opacity = 1
+            })
+        })
+        zoomInBtn.addEventListener("click", () => {
+            pz.zoomIn()
+        })
+        zoomOutBtn.addEventListener("click", () => {
+            pz.zoomOut()
+            if (pz.getScale() === 1) {
+                pz.reset()
+            }
+        })
+
+        function parseLotId(id) {
+            let lotData = {
+                mz: "",
+                lt: "",
+            }
+
+            let [mzStr, ltStr] = id.split("_")
+            lotData.mz = mzStr.split("-")[1]
+            lotData.lt = ltStr.split("-")[1]
+
+            return lotData
+        }
+    })
+</script>
+<section class="relative z-0 flex flex-col max-w-full  overflow-hidden" id="seccion-plano">
+    <div class="absolute inset-0 bg-stone-950 bg-opacity-60 flex flex-col items-center justify-center gap-4 z-40 text-stone-400">
+        <svg class="w-32 h-32 fill-current">
+            <use href="/static/svg/wrench.svg#wrench"></use>
+        </svg>
+        <p class="text-2xl font-semibold text-center w-[24ch]">Estamos trabajando en ello...</p>
+    </div>
+    <h1 class="text-center text-3xl text-indigo-900 font-extrabold uppercase mb-4 lg:mb-8">Plano de disponibilidad</h1>
+    <div class="w-full flex-auto grid grid-cols-2 grid-rows-2 lg:grid-rows-1 px-4">
+        <!-- Plan -->
+        <div class="relative col-span-full row-start-1 lg:col-span-1 z-0 bg-stone-400 rounded">
+            <object
+                id="plan-object"
+                data="/static/svg/plan.svg"
+                type="image/svg+xml"
+                class="w-full max-h-[80vh] object-center rounded">
+            </object>
+            <div class="absolute bottom-2 right-2">
+                <button class="h-8 w-8 flex items-center justify-center rounded-t bg-stone-200" id="plan-zoom-in">
+                    <svg class="w-4 h-4 fill-stone-400 rotate-45">
+                        <use href="/static/svg/times.svg#times"></use>
+                    </svg>
+                </button>
+                <button class="h-8 w-8 flex items-center justify-center rounded-b bg-stone-200" id="plan-zoom-out">
+                    <svg class="w-8 h-8 stroke-stone-400">
+                        <use href="/static/svg/minus.svg#minus"></use>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="col-span-full row-start-1 lg:col-span-1">
+            <div class="relative opacity-100 px-4">
+                <h2 class="text-xl font-semibold text-slate-700">¿Cómo funciona?</h2>
+                <div class="py-2"></div>
+                <ol class="space-y-4">
+                    <li class="max-w-[50ch]">
+                        <p class="text-slate-700 font-bold">1. Selecciona un lote</p>
+                        <p class="">Da click en el lote que te interese, si está disponible verás la información del mismo.</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}

@@ -26,6 +26,8 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 		"web/templates/layout.html",
 		"web/templates/index.html",
 		"web/templates/sections/gallery.html",
+		"web/templates/sections/amenities.html",
+		"web/templates/sections/plan.html",
 	)
 
 	if err != nil {
