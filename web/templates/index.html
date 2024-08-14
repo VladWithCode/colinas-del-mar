@@ -167,7 +167,7 @@
             zoom: 15,
             mapId: "EX_MAP_ID",
         })
-        let tagClassName = "distance-tag bg-indigo-900 rounded py-2 px-4 text-stone-50 text-lg font-semibold -translate-y-4"
+        let tagClassName = "distance-tag bg-indigo-900 rounded py-2 px-4 text-stone-50 xl:text-lg font-semibold -translate-y-4"
 
         let distanceTagPark = document.createElement("div")
         distanceTagPark.className = tagClassName;
@@ -190,6 +190,11 @@
             position: { lat: 23.1939388, lng: -106.3261381},
             content: distanceTagPark,
         })
+
+        let mql = window.matchMedia("(max-width: 1280px)")
+        if (mql.matches) {
+            map.setZoom(14)
+        }
     })
 </script>
 <div class="relative h-dvh pt-16 px-4 z-0 overflow-hidden" id="hero-wrapper">
@@ -366,13 +371,13 @@
 {{template "amenities"}}
 
 <section class="relative z-0" id="seccion-ubicacion">
-    <div class="absolute -top-8 right-8 z-10 bg-indigo-950 text-stone-50 py-8 px-10 rounded">
+    <div class="relative xl:absolute xl:-top-8 xl:right-8 z-10 bg-indigo-950 text-stone-50 py-8 px-10 xl:rounded">
         <h1 class="text-center text-3xl font-extrabold px-10 uppercase">
             Ubicados<br>
             A 30 Minutos de la Playa
         </h1>
         <div class="py-2"></div>
-        <p class="w-[52ch] text-center font-light mx-auto">
+        <p class="xl:w-[52ch] text-center font-light mx-auto">
         Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolorum dicta voluptatem quia voluptate assumenda.
         </p>
     </div>

@@ -572,10 +572,6 @@ video {
   inset: 0px;
 }
 
-.-top-8 {
-  top: -2rem;
-}
-
 .bottom-0 {
   bottom: 0px;
 }
@@ -602,10 +598,6 @@ video {
 
 .right-2 {
   right: 0.5rem;
-}
-
-.right-8 {
-  right: 2rem;
 }
 
 .top-0 {
@@ -1395,12 +1387,12 @@ video {
   padding-bottom: 2rem;
 }
 
-.pb-12 {
-  padding-bottom: 3rem;
+.pb-1 {
+  padding-bottom: 0.25rem;
 }
 
-.pb-2 {
-  padding-bottom: 0.5rem;
+.pb-12 {
+  padding-bottom: 3rem;
 }
 
 .pb-24 {
@@ -1441,10 +1433,6 @@ video {
 
 .pt-8 {
   padding-top: 2rem;
-}
-
-.pb-1 {
-  padding-bottom: 0.25rem;
 }
 
 .text-center {
@@ -1791,6 +1779,18 @@ a[disabled] {
 }
 
 @media (min-width: 1280px) {
+  .xl\:absolute {
+    position: absolute;
+  }
+
+  .xl\:-top-8 {
+    top: -2rem;
+  }
+
+  .xl\:right-8 {
+    right: 2rem;
+  }
+
   .xl\:flex {
     display: flex;
   }
@@ -1807,12 +1807,20 @@ a[disabled] {
     height: 100%;
   }
 
+  .xl\:h-\[70vh\] {
+    height: 70vh;
+  }
+
   .xl\:w-full {
     width: 100%;
   }
 
   .xl\:w-screen {
     width: 100vw;
+  }
+
+  .xl\:w-\[52ch\] {
+    width: 52ch;
   }
 
   .xl\:max-w-screen-lg {
@@ -1849,6 +1857,10 @@ a[disabled] {
     margin-bottom: calc(0px * var(--tw-space-y-reverse));
   }
 
+  .xl\:rounded {
+    border-radius: 0.25rem;
+  }
+
   .xl\:px-4 {
     padding-left: 1rem;
     padding-right: 1rem;
@@ -1857,6 +1869,11 @@ a[disabled] {
   .xl\:py-16 {
     padding-top: 4rem;
     padding-bottom: 4rem;
+  }
+
+  .xl\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 }
 
