@@ -644,14 +644,6 @@ video {
   z-index: 40;
 }
 
-.z-50 {
-  z-index: 50;
-}
-
-.z-\[60\] {
-  z-index: 60;
-}
-
 .col-span-full {
   grid-column: 1 / -1;
 }
@@ -750,10 +742,6 @@ video {
   height: 5rem;
 }
 
-.h-24 {
-  height: 6rem;
-}
-
 .h-32 {
   height: 8rem;
 }
@@ -830,10 +818,6 @@ video {
   width: 5rem;
 }
 
-.w-24 {
-  width: 6rem;
-}
-
 .w-3\/4 {
   width: 75%;
 }
@@ -858,12 +842,20 @@ video {
   width: 1.5rem;
 }
 
+.w-60 {
+  width: 15rem;
+}
+
 .w-8 {
   width: 2rem;
 }
 
 .w-\[20ch\] {
   width: 20ch;
+}
+
+.w-\[24ch\] {
+  width: 24ch;
 }
 
 .w-\[28ch\] {
@@ -897,10 +889,6 @@ video {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-\[24ch\] {
-  width: 24ch;
 }
 
 .max-w-96 {
@@ -1032,10 +1020,6 @@ video {
 
 .auto-rows-fr {
   grid-auto-rows: minmax(0, 1fr);
-}
-
-.auto-rows-min {
-  grid-auto-rows: min-content;
 }
 
 .grid-cols-2 {
@@ -1261,33 +1245,21 @@ video {
   background-color: rgb(28 25 23 / var(--tw-bg-opacity));
 }
 
-.bg-transparent {
-  background-color: transparent;
-}
-
 .bg-stone-950 {
   --tw-bg-opacity: 1;
   background-color: rgb(12 10 9 / var(--tw-bg-opacity));
+}
+
+.bg-transparent {
+  background-color: transparent;
 }
 
 .bg-opacity-10 {
   --tw-bg-opacity: 0.1;
 }
 
-.bg-opacity-20 {
-  --tw-bg-opacity: 0.2;
-}
-
 .bg-opacity-60 {
   --tw-bg-opacity: 0.6;
-}
-
-.bg-opacity-40 {
-  --tw-bg-opacity: 0.4;
-}
-
-.bg-opacity-80 {
-  --tw-bg-opacity: 0.8;
 }
 
 .fill-current {
@@ -1302,16 +1274,8 @@ video {
   fill: #fafaf9;
 }
 
-.fill-stone-500 {
-  fill: #78716c;
-}
-
 .fill-stone-950 {
   fill: #0c0a09;
-}
-
-.fill-stone-700 {
-  fill: #44403c;
 }
 
 .stroke-stone-400 {
@@ -1401,11 +1365,6 @@ video {
   padding-bottom: 3rem;
 }
 
-.py-16 {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
 .py-2 {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
@@ -1438,6 +1397,10 @@ video {
 
 .pb-12 {
   padding-bottom: 3rem;
+}
+
+.pb-2 {
+  padding-bottom: 0.5rem;
 }
 
 .pb-24 {
@@ -1478,6 +1441,10 @@ video {
 
 .pt-8 {
   padding-top: 2rem;
+}
+
+.pb-1 {
+  padding-bottom: 0.25rem;
 }
 
 .text-center {
@@ -1551,9 +1518,19 @@ video {
   color: rgb(29 78 216 / var(--tw-text-opacity));
 }
 
+.text-emerald-500 {
+  --tw-text-opacity: 1;
+  color: rgb(16 185 129 / var(--tw-text-opacity));
+}
+
 .text-indigo-900 {
   --tw-text-opacity: 1;
   color: rgb(49 46 129 / var(--tw-text-opacity));
+}
+
+.text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 
 .text-slate-700 {
@@ -1571,6 +1548,11 @@ video {
   color: rgb(214 211 209 / var(--tw-text-opacity));
 }
 
+.text-stone-400 {
+  --tw-text-opacity: 1;
+  color: rgb(168 162 158 / var(--tw-text-opacity));
+}
+
 .text-stone-50 {
   --tw-text-opacity: 1;
   color: rgb(250 250 249 / var(--tw-text-opacity));
@@ -1584,41 +1566,6 @@ video {
 .text-stone-950 {
   --tw-text-opacity: 1;
   color: rgb(12 10 9 / var(--tw-text-opacity));
-}
-
-.text-stone-700 {
-  --tw-text-opacity: 1;
-  color: rgb(68 64 60 / var(--tw-text-opacity));
-}
-
-.text-stone-800 {
-  --tw-text-opacity: 1;
-  color: rgb(41 37 36 / var(--tw-text-opacity));
-}
-
-.text-stone-200 {
-  --tw-text-opacity: 1;
-  color: rgb(231 229 228 / var(--tw-text-opacity));
-}
-
-.text-stone-400 {
-  --tw-text-opacity: 1;
-  color: rgb(168 162 158 / var(--tw-text-opacity));
-}
-
-.text-stone-600 {
-  --tw-text-opacity: 1;
-  color: rgb(87 83 78 / var(--tw-text-opacity));
-}
-
-.text-emerald-500 {
-  --tw-text-opacity: 1;
-  color: rgb(16 185 129 / var(--tw-text-opacity));
-}
-
-.text-red-500 {
-  --tw-text-opacity: 1;
-  color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 
 .opacity-0 {
@@ -1848,12 +1795,24 @@ a[disabled] {
     display: flex;
   }
 
+  .xl\:grid {
+    display: grid;
+  }
+
+  .xl\:h-auto {
+    height: auto;
+  }
+
   .xl\:h-full {
     height: 100%;
   }
 
   .xl\:w-full {
     width: 100%;
+  }
+
+  .xl\:w-screen {
+    width: 100vw;
   }
 
   .xl\:max-w-screen-lg {
@@ -1872,6 +1831,18 @@ a[disabled] {
     flex-basis: 33.333333%;
   }
 
+  .xl\:auto-rows-min {
+    grid-auto-rows: min-content;
+  }
+
+  .xl\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .xl\:gap-2 {
+    gap: 0.5rem;
+  }
+
   .xl\:space-y-0 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-y-reverse: 0;
     margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
@@ -1881,6 +1852,11 @@ a[disabled] {
   .xl\:px-4 {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .xl\:py-16 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
   }
 }
 
