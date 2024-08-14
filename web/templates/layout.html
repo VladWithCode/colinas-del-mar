@@ -138,16 +138,16 @@
                     <a href="/" class="">Inicio</a>
                 </li>
                 <li class="py-2 px-4 border-stone-400 border-b">
-                    <a href="/" class="">Plano</a>
+                    <a href="#seccion-plano" class="">Plano</a>
                 </li>
                 <li class="py-2 px-4 border-stone-400 border-b">
-                    <a href="/" class="">Avance de Obra</a>
+                    <a href="#formulario-contacto" class="">Contacto</a>
                 </li>
                 <li class="py-2 px-4 border-stone-400 border-b">
-                    <a href="/" class="">Contacto</a>
+                    <a href="#seccion-ubicacion" class="">Ubicacion</a>
                 </li>
-                <li class="py-2 px-4">
-                    <a href="/" class="">Más Proyectos</a>
+                <li class="py-2 px-4 text-indigo-900 font-semibold border-stone-400 border-b">
+                    <a href="https://sibradgo.com.mx" class="">Sibra Durango</a>
                 </li>
             </ul>
         </div>
@@ -158,12 +158,12 @@
 
     {{block "footer" .}}
     <footer class="bg-indigo-950 px-4 py-8 pb-12">
-        <div class="space-y-4 mx-auto xl:max-w-screen-xl xl:flex xl:space-y-0 gap-4">
-            <div class="flex flex-col basis-1/4 shrink grow-0 pt-2 col-start-1">
+        <div class="space-y-6 mx-auto xl:max-w-screen-xl xl:flex xl:space-y-0 gap-4">
+            <div class="flex flex-col basis-1/4 shrink grow-0 pt-2 col-start-1 px-4 xl:px-0">
                 <img src="/static/img/colinas_logo.png" alt="Logo de Sibra Durango" class="w-full object-center mx-auto px-8 pb-4">
-                <p class="w-[28ch] text-stone-100 text-lg font-light py-2 mx-auto">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Soluta tenetur dolor eos sunt sapiente quisquam quidem ducimus voluptate in eum.</p>
+                <p class="xl:w-[28ch] text-stone-100 text-lg font-light py-2 mx-auto">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Soluta tenetur dolor eos sunt sapiente quisquam quidem ducimus voluptate in eum.</p>
             </div>
-            <div class="basis-1/4 shrink grow px-6">
+            <div class="basis-1/4 shrink grow px-4 xl:px-6">
                 <h2 class="text-xl text-stone-50 font-bold pb-4 uppercase">Menú</h2>
                 <ul class="space-y-2 text-lg font-light text-stone-50">
                     <li class="">
@@ -180,8 +180,8 @@
                     </li>
                 </ul>
             </div>
-            <div class="space-y-4 basis-2/3 shrink grow-0">
-                <h2 class="text-xl text-stone-50 font-bold uppercase text-center">¡Contactanos!</h2>
+            <div class="space-y-4 basis-2/3 shrink grow-0 px-4 xl:px-0">
+                <h2 class="text-xl text-stone-50 font-bold uppercase xl:text-center">¡Contactanos!</h2>
                 {{block "contact-form" .}}
                 <form
                     id="formulario-contacto"
@@ -212,7 +212,7 @@
                 </form>
                 {{end}}
             </div>
-            <div class="space-y-4 basis-1/4 shrink-0 grow-0 xl:px-4">
+            <div class="space-y-4 basis-1/4 shrink-0 grow-0 px-4">
                 <h2 class="text-xl font-bold text-stone-50 uppercase">Comunicate</h2>
                 <ul class="space-y-4 text-stone-50 text-lg">
                     <li class="flex gap-5">
