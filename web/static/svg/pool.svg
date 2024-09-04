@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg  version="1.1" id="pool" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512.001 512.001" xml:space="preserve">
+<svg id="pool" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 512.001 512.001" xml:space="preserve">
 <g>
 	<g>
 		<path d="M184.653,0c-22.084,0-42.853,8.6-58.487,24.219c-8.252,8.252-14.552,17.931-18.727,28.767
@@ -63,4 +64,4 @@
 			c5.205,0,9.423-4.219,9.423-9.423s-4.218-9.423-9.423-9.423H120.78v-77.947h222.754V253.35z"/>
 	</g>
 </g>
-</svg
+</svg>
