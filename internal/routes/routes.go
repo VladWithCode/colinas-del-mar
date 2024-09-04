@@ -15,6 +15,7 @@ func NewRouter() http.Handler {
 	router.Handle("GET /static/", http.StripPrefix("/static/", fs))
 
 	RegisterContactRoutes(router)
+	RegisterQuoteRoutes(router)
 
 	// 404 & 5xx pages
 	router.HandleFunc("GET /", RenderNotFound)
