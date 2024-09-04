@@ -1,5 +1,6 @@
 {{define "plan"}}
 <script>
+    const LOT_DATA = {{.LotData}}
     document.addEventListener("DOMContentLoaded", () => {
         let planObject = document.getElementById("plan-object")
         let zoomInBtn = document.getElementById("plan-zoom-in")
@@ -30,22 +31,41 @@
                 })
                 lot.addEventListener("click", e => {
                     e.stopPropagation()
-                    let rect = lot.getClientRects()[0]
-                    let x = planCenter[0] - rect.x,
-                        y = planCenter[1] - rect.y;
+                    // Reset active tab to 'detail'
+                    let currentTabElem = document.querySelector("[data-popup-tab-active]")
+                    let currentPillBtn = document.querySelector("[data-popup-tab-btn-active]")
+                    let detailTabElem = document.querySelector('[data-popup-tab="detail"]')
+                    let detailPillBtn = document.querySelector('[data-popup-tab-btn="detail"]')
 
-                    pz.zoom(6)
-                    setTimeout(() => {
-                        pz.pan(x, y)
-                    }, 100)
-                    planDoc.getElementById("plan-sat").style.opacity = 0.7
+                    if (currentTabElem !== detailTabElem) {
+                        currentTabElem.style.padding = "0px"
+                        currentTabElem.removeAttribute("data-popup-tab-active")
+                        currentPillBtn.classList.remove("text-stone-50", "font-semibold")
+                        currentPillBtn.removeAttribute("data-popup-tab-btn-active")
+                        currentTabElem.style.height = "0px"
+                        currentTabElem.style.visibility = "hidden"
+                        currentTabElem.style.opacity = 0
 
-                    for (let l of lots){
-                        let isActive = l === lot
-                        l.classList.toggle("active-lot", isActive)
-                        l.style.display = isActive ? "block" : "none"
+                        detailTabElem.style.padding = ""
+                        detailTabElem.setAttribute("data-popup-tab-active", true)
+                        detailPillBtn.classList.add("text-stone-50", "font-semibold")
+                        detailPillBtn.setAttribute("data-popup-tab-btn-active", true)
+                        detailTabElem.style.height = ""
+                        detailTabElem.style.visibility = "visible"
+                        detailTabElem.style.opacity = 1
                     }
-                    lotWrapper.appendChild(lot)
+
+                    let planImg = document.getElementById("plan-popup-img")
+                    planImg.src = "/static/img/land-available.webp"
+
+                    let contentHeight = document.getElementById("plan-popup-content").scrollHeight
+                    let tl = gsap.timeline({duration:0.4,ease:"power2.in"})
+                    tl.to("#plan-popup", {autoAlpha:1, duration:0.1})
+                    tl.to("#plan-popup-content", {height:contentHeight+"px"}, "<0.2")
+                    
+
+                    document.getElementById("plan-popup-pill").style.left = "0px"
+                    document.getElementById("plan-popup-pill").style.width = detailPillBtn.scrollWidth+"px"
                 })
 
             }
@@ -57,6 +77,7 @@
                 planDoc.getElementById("plan-sat").style.opacity = 1
             })
         })
+        
         zoomInBtn.addEventListener("click", () => {
             pz.zoomIn()
         })
@@ -65,6 +86,16 @@
             if (pz.getScale() === 1) {
                 pz.reset()
             }
+        })
+
+        let planPopup = document.getElementById("plan-popup")
+        let planPopupContent = document.getElementById("plan-popup-content")
+        let closePopup = document.getElementById("plan-popup-close-btn")
+
+        closePopup.addEventListener("click", () => {
+            let tl = gsap.timeline({duration:0.4,ease:"power2.in"})
+            tl.to(planPopupContent, {height:"0px"})
+            tl.to(planPopup, {autoAlpha:0}, "<0.2")
         })
 
         function parseLotId(id) {
@@ -79,24 +110,326 @@
 
             return lotData
         }
+
+        // Popup Tabs
+        let contactNowBtn = document.getElementById("popup-contact-now-btn")
+        let calcCreditBtn = document.getElementById("popup-calc-credit-btn")
+        let bookPriceBtn = document.getElementById("credit-book-price-btn")
+        let popupPill = document.getElementById("plan-popup-pill")
+        let popupTabBtns = document.querySelectorAll("[data-popup-tab-btn]")
+
+        // Force pill to be btn sized
+        popupPill.style.width = popupTabBtns[0].clientWidth + "px"
+        // Force save initial scrollHeight for tabs
+        let popupTabs = document.querySelectorAll("[data-popup-tab]")
+        for (let tab of popupTabs) {
+            tab.dataset.scrollHeight = tab.scrollHeight
+            if (!tab.hasAttribute("[data-popup-tab-active]")) {
+                tab.style.padding = "0px"
+            }
+        }
+
+        contactNowBtn.addEventListener("click", handleTabChange)
+        calcCreditBtn.addEventListener("click", handleTabChange)
+        bookPriceBtn.addEventListener("click", handleTabChange)
+
+        for (let tabBtn of popupTabBtns) {
+            tabBtn.addEventListener("click", handleTabChange)
+        }
+
+        function handleTabChange(e) {
+            e.preventDefault()
+            // Reset contentHeight so animations work
+            planPopupContent.style.height = ""
+
+            let targetTabId = e.target.dataset.popupTabBtn || e.target.dataset.popupTabCta
+            let targetTabElem = document.querySelector('[data-popup-tab="'+targetTabId+'"]')
+            let targetPillBtn = document.querySelector('[data-popup-tab-btn="'+targetTabId+'"]')
+            let currentTabElem = document.querySelector('[data-popup-tab-active]')
+            let currentPillBtn = document.querySelector('[data-popup-tab-btn-active]')
+
+            if (!targetTabElem) {
+                // TODO: Change tab to detail | display some error
+                return
+            }
+
+            let tl = gsap.timeline({ ease: "power2.in" })
+            if (currentTabElem) {
+                tl.to(currentTabElem, { height: "0px", autoAlpha: 0, duration: 0.4 })
+                currentTabElem.style.padding = "0px"
+                currentTabElem.removeAttribute("data-popup-tab-active")
+                currentPillBtn.classList.remove("text-stone-50", "font-semibold")
+                currentPillBtn.removeAttribute("data-popup-tab-btn-active")
+            }
+
+            targetTabElem.style.padding = ""
+            targetPillBtn.classList.add("text-stone-50", "font-semibold")
+            tl.to(targetTabElem, { 
+                height: targetTabElem.dataset.scrollHeight+"px",
+                autoAlpha: 1,
+                duration: 0.4
+            }, "<0.1")
+            tl.to(popupPill, {
+                left: targetPillBtn.offsetLeft+"px", 
+                width: targetPillBtn.scrollWidth+"px"
+            },"<")
+
+            targetTabElem.dataset.popupTabActive = true
+            targetPillBtn.dataset.popupTabBtnActive = true
+        }
+
+        // Credit Calc
+        const priceFormatter = new Intl.NumberFormat("es-MX", {style:"currency",currency:"MXN",minimumFractionDigits:2,maximumFractionDigits:2})
+        const DEFAULT_PRICE = 192_000
+        const PRICE_BY_TIME = {
+            "3": 192_000,
+            "6": 192_000,
+            "12": 192_000,
+            "18": 192_000,
+            "24": 192_000,
+            "32": 192_000,
+            "48": 192_000,
+        }
+        const MIN_CRED_DEPOSIT = 24_000
+        let creditPriceElem = document.getElementById("credit-current-total")
+        let creditDepositInp = document.getElementById("credit-deposit")
+        let creditTimeSelect = document.getElementById("credit-time")
+        let creditInterestElem = document.getElementById("credit-interest")
+        let creditInstallmentElem = document.getElementById("credit-installment")
+
+        let currentCreditTime = Number(creditTimeSelect.value)
+        let currentTotal = PRICE_BY_TIME[currentCreditTime] || DEFAULT_PRICE
+        creditPriceElem.dataset.creditTotal = currentTotal
+
+        let remainingBalance = currentTotal - Number(creditDepositInp.value)
+        creditInstallmentElem.dataset.creditInstallment = Math.ceil(remainingBalance/currentCreditTime)
+
+        renderCreditChange()
+
+        creditDepositInp.addEventListener("change", e => {
+            let val = Number(e.target.value)
+            if (isNaN(val) || val < MIN_CRED_DEPOSIT) {
+                creditDepositInp.value = MIN_CRED_DEPOSIT
+                alert("El anticipo minimo es de $24,000.00 MXN")
+                return
+            }
+
+            let credTime = creditTimeSelect.value
+            let credTotal = PRICE_BY_TIME[credTime] || DEFAULT_PRICE
+            creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, val, credTime)
+            renderCreditChange()
+        })
+        creditTimeSelect.addEventListener("change", e => {
+            let val = e.target.value
+            let credTotal = PRICE_BY_TIME[val] || DEFAULT_PRICE
+            let credDeposit = creditDepositInp.value
+            creditPriceElem.dataset.creditTotal = credTotal
+            creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, credDeposit, val)
+            renderCreditChange()
+        })
+
+        function calcCreditInstallment(creditTotal, deposit, creditTime) {
+            let remainingBalance = creditTotal - deposit
+            if (remainingBalance < 0) {
+                return 0
+            }
+            return Math.ceil(remainingBalance/creditTime)
+        }
+        function renderCreditChange() {
+            creditPriceElem.textContent = priceFormatter.format(Number(creditPriceElem.dataset.creditTotal))
+            creditInstallmentElem.textContent = priceFormatter.format(Number(creditInstallmentElem.dataset.creditInstallment))
+        }
+
+        // Contact Form
+        let contactLotNumInp = document.getElementById("popup-contact-lot-num")
+        let contactLotTypeInp = document.getElementById("popup-contact-lot-type")
+        let contactMzInp = document.getElementById("popup-contact-mz")
+        let contactCredTimeInp = document.getElementById("popup-contact-cred-time")
+        let contactCredDepositInp = document.getElementById("popup-contact-cred-deposit")
+        let contactPaymentTypeInp = document.getElementById("popup-payment-type")
+        
+        contactPaymentTypeInp.addEventListener("change", e => {
+            let payType = e.target.value
+
+            if (payType !== "credit") {
+                contactCredTimeInp.value = ""
+                contactCredDepositInp.value = ""
+                return
+            }
+
+            contactCredTimeInp.value = creditTimeSelect.value
+            contactCredDepositInp.value = creditDepositInp.value
+        })
     })
 </script>
-<section class="relative z-0 flex flex-col max-w-full  overflow-hidden" id="seccion-plano">
-    <div class="absolute inset-0 bg-stone-950 bg-opacity-60 flex flex-col items-center justify-center gap-4 z-40 text-stone-400">
-        <svg class="w-32 h-32 fill-current">
-            <use href="/static/svg/wrench.svg#wrench"></use>
-        </svg>
-        <p class="text-2xl font-semibold text-center w-[24ch]">Estamos trabajando en ello...</p>
-    </div>
+<section class="z-0 flex flex-col max-w-full  overflow-hidden" id="seccion-plano">
     <h1 class="text-center text-3xl text-indigo-900 font-extrabold uppercase mb-4 lg:mb-8">Plano de disponibilidad</h1>
-    <div class="w-full flex-auto grid grid-cols-2 grid-rows-2 lg:grid-rows-1 px-4">
+    <!-- Popup -->
+    <div class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6 invisible" id="plan-popup">
+        <div 
+            class="flex flex-col w-full xl:max-w-[75%] mx-auto bg-stone-50 rounded overflow-hidden"
+            style="height: 0px"
+            id="plan-popup-content">
+            <!-- Header -->
+           <div class="flex justify-between gap-2 shrink grow-0 border-b-2 border-stone-200">
+               <div class="overflow-x-auto p-2">
+                   <div class="relative flex gap-2 text-sm z-0 basis-full grow text-stone-700 ">
+                       <p 
+                       class="absolute top-0 left-0 rounded px-2 py-1.5 bg-slate-700 text-transparent outline outline-2 outline-indigo-600 uppercase -z-10"
+                       id="plan-popup-pill">&nbsp;</p>
+                       <button
+                           class="text-stone-50 px-2 py-1.5 font-semibold rounded uppercase"
+                           data-popup-tab-btn="detail"
+                           data-popup-tab-btn-active>detalles</button>
+                       <button 
+                           class="px-2 py-1.5 rounded uppercase"
+                           data-popup-tab-btn="calc">calculadora</button>
+                       <button 
+                           class="px-2 py-1.5 rounded uppercase"
+                           data-popup-tab-btn="form">contacto</button>
+                   </div>
+               </div>
+               <div class="w-10 flex items-center justify-center grow-0 shrink">
+                   <button id="plan-popup-close-btn">
+                       <svg class="h-4 w-4 fill-current">
+                           <use href="/static/svg/times.svg#times"></use>
+                       </svg>
+                   </button>
+               </div>
+           </div>
+
+           <!-- Body -->
+           <div class="relative flex-1">
+               <div
+                   class="flex flex-col xl:flex-row xl:gap-4 overflow-hidden"
+                   data-popup-tab="detail"
+                   data-popup-tab-active>
+                   <div class="relative basis-1/2 shrink grow-0 xl:h-auto xl:basis-1/2 xl:shrink xl:grow z-0">
+                       <img
+                           src="/static/img/land-thumb.jpg"
+                           alt="Representación artistica del terreno que se esta promocionando"
+                           class="relative w-full h-full object-center object-cover -z-10"
+                           data-popup-img-availability="available"
+                           id="plan-popup-img">
+                   </div>
+                   <div class="relative basis-1/2 shrink grow xl:h-auto xl:basis-1/3 xl:mx-auto p-2 overflow-y-auto overflow-x-hidden bg-stone-50 z-10">
+                       <p class="text-3xl xl:text-5xl font-bold text-indigo-900">$172,800.00</p>
+                       <div class="py-0.5"></div>
+                       <p class="text-lg xl:text-xl text-stone-700 font-semibold">Lote 1 Manzana 1</p>
+                       <p class="text-sm text-emerald-500 font-medium xl:text-base">Disponible</p>
+                       <div class="py-2"></div>
+                       <ul class="flex justify-between py-1">
+                           <li class="xl:text-lg">
+                               <!-- <svg class="w-6 h-6 fill-current">
+                                   <use href="/static/svg/square.svg#square"></use>
+                               </svg> -->
+                               <p class="font-bold">Area:</p>
+                               <p class="text-stone-600">90m<sup>2</sup></p>
+                           </li>
+                           <li class="xl:text-lg">
+                               <p class="font-bold">Dimensiones:</p>
+                               <p class="text-stone-600">6&times;16m</p>
+                           </li>
+                           <li class="xl:text-lg">
+                               <div class="font-bold">Precio/m<sup>2</sup></div>
+                               <p class="text-stone-600">$1,500.00/m<sup>2</sup></p>
+                           </li>
+                       </ul>
+                       <div class="py-4"></div>
+                       <div class="relative flex flex-col space-y-2 bottom-0" id="popup-cta-wrapper">
+                           <button 
+                               class="bg-orange-500 py-2 text-stone-50 font-medium rounded"
+                               id="popup-contact-now-btn"
+                               data-popup-tab-cta="form">Contactácnos ahora</button>
+                           <button
+                               class="bg-indigo-900 py-2 text-stone-50 font-medium rounded"
+                               id="popup-calc-credit-btn" 
+                               data-popup-tab-cta="calc">Cotiza tu Financiamiento</button>
+                       </div>
+                   </div>
+               </div>
+
+               <div
+                   class="p-2 overflow-hidden invisible h-0"
+                   data-popup-tab="calc">
+                   <h2 class="text-xl text-stone-800 font-semibold">Calculadora de Financiamiento</h2>
+                   <p class="text-stone-400 font-medium">Utiliza la calculadora para elegir el Financiamiento más adecuado para ti.</p>
+                   <div class="py-1"></div>
+                   <div class="flex gap-2">
+                       <div class="basis-1/2 flex-1">
+                           <p class="text-sm text-stone-900 font-semibold">Precio<br>de contado</p>
+                           <p class="text-2xl font-bold text-indigo-900 mt-auto">$172,800.00</p>
+                       </div>
+                       <div class="basis-1/2 flex-1">
+                           <p class="text-sm text-stone-900 font-semibold">Precio <br>Financiado</p>
+                           <p class="text-2xl font-bold text-indigo-900 mt-auto" id="credit-current-total" data-credit-total="192_000.00">$192,000.00</p>
+                       </div>
+                   </div>
+                   <div class="py-1"></div>
+                   <div class="flex gap-2">
+                       <div class="flex-1 basis-1/2 space-y-1">
+                           <p class="text-sm text-stone-900 font-semibold">Enganche</p>
+                           <input 
+                           class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
+                           type="number"
+                           name="deposit"
+                           id="credit-deposit"
+                           min="24000"
+                           placeholder="24000"
+                           value="24000"
+                           data-credit-min-deposit="0">
+                       </div>
+                       <div class="flex-1 basis-1/2 space-y-1">
+                           <p class="text-sm text-stone-900 font-semibold">Plazo</p>
+                           <select 
+                               class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
+                               name="time" 
+                               id="credit-time">
+                               <option value="3">3 meses</option>
+                               <option value="6">6 meses</option>
+                               <option value="12">12 meses</option>
+                               <option value="18">18 meses</option>
+                               <option value="24">24 meses</option>
+                               <option value="32">32 meses</option>
+                               <option value="48" selected>48 meses</option>
+                           </select>
+                       </div>
+                   </div>
+                   <div class="py-1"></div>
+                  <div class="flex gap-2">
+                      <div class="grow-0 basis-1/2 pl-1">
+                          <p class="text-stone-900 font-bold">Precio/m<sup>2</sup></p>
+                          <p class="text-2xl font-bold text-indigo-900" id="credit-sqmt-price">$2,000.00</p>
+                      </div>
+                      <div class="grow-0 basis-1/2 pl-1">
+                          <p class="text-stone-900 font-bold">Mensualidad</p>
+                          <p class="text-2xl font-bold text-indigo-900" id="credit-installment" data-credit-installment="2_587">$2,587.00</p>
+                      </div>
+                  </div> 
+                  <div class="py-2"></div>
+                  <div class="flex">
+                      <button 
+                          type="button"
+                          role="button"
+                          class="bg-orange-500 text-stone-50 font-medium w-full py-2 rounded"
+                          id="credit-book-price-btn"
+                          data-popup-tab-cta="form">Reservar precio</button>
+                  </div>
+               </div>
+
+               {{template "popup-form" .}}
+           </div>
+
+        </div>
+    </div>
+    <div class="w-full flex-auto px-4">
         <!-- Plan -->
-        <div class="relative col-span-full row-start-1 lg:col-span-1 z-0 bg-stone-400 rounded">
+        <div class="relative w-full max-w-screen-xl mx-auto z-0 rounded overflow-hidden">
             <object
                 id="plan-object"
                 data="/static/svg/plan.svg"
                 type="image/svg+xml"
-                class="w-full max-h-[80vh] object-center rounded">
+                class="w-full max-h-[80vh] object-center">
             </object>
             <div class="absolute bottom-2 right-2">
                 <button class="h-8 w-8 flex items-center justify-center rounded-t bg-stone-200" id="plan-zoom-in">
@@ -112,19 +445,86 @@
             </div>
         </div>
 
-        <!-- Form -->
-        <div class="col-span-full row-start-1 lg:col-span-1">
-            <div class="relative opacity-100 px-4">
-                <h2 class="text-xl font-semibold text-slate-700">¿Cómo funciona?</h2>
-                <div class="py-2"></div>
-                <ol class="space-y-4">
-                    <li class="max-w-[50ch]">
-                        <p class="text-slate-700 font-bold">1. Selecciona un lote</p>
-                        <p class="">Da click en el lote que te interese, si está disponible verás la información del mismo.</p>
-                    </li>
-                </ol>
-            </div>
-        </div>
     </div>
 </section>
+{{end}}
+
+{{define "popup-form"}}
+<form
+    class="relative p-2 overflow-hidden invisible h-0"
+    data-popup-tab="form"
+    hx-post="/api/lot-contact"
+    hx-swap="outerHTML">
+    <input type="hidden" name="lotNum" id="popup-contact-lot-num">
+    <input type="hidden" name="mz" id="popup-contact-mz">
+    <input type="hidden" name="lotType" id="popup-contact-lot-type">
+    <input type="hidden" name="credDeposit" id="popup-contact-cred-deposit">
+    <input type="hidden" name="credTime" id="popup-contact-cred-time">
+    <div class="flex flex-col items-center justify-center absolute inset-0 bg-stone-700 bg-opacity-70 invisible">
+        <img
+        class="w-24 h-24 scale-100"
+        width="200"
+        height="200"
+        src="/static/img/loading.webp"
+        alt="Animacion de carga de formulario">
+        <p class="text-lg text-stone-50 font-semibold">Cargando...</p>
+    </div>
+
+    <h2 class="text-xl text-stone-800 font-semibold">Contacto</h2>
+    <p class="text-stone-400 font-medium">Contáctanos y te responderemos a la brevedad con la información del lote que te interesa</p>
+    <div class="py-1"></div>
+    <div class="flex gap-2">
+        <div class="flex-1 basis-1/2">
+            <label for="popup-contact-name" class="block text-stone-900 font-medium">Nombre</label>
+            <div class="py-px"></div>
+            <input 
+            class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
+            type="text"
+            name="name"
+            id="popup-contact-name"
+            placeholder="Juan Perez"
+            required>
+        </div>
+    </div>
+    <div class="py-1"></div>
+    <div class="flex gap-2">
+        <div class="flex-1 basis-1/2">
+            <label for="popup-contact-name" class="block text-stone-900 font-medium">Teléfono</label>
+            <div class="py-px"></div>
+            <input 
+            class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
+            type="tel"
+            name="phone"
+            id="popup-contact-phone"
+            placeholder="6181234455"
+            required>
+        </div>
+    </div>
+    <div class="py-1"></div>
+    <div class="flex">
+        <div class="flex-1 basis-1/2">
+            <label for="popup-payment-type" class="block text-stone-900 font-medium">Me interesa el pago:</label>
+            <div class="py-px"></div>
+            <select 
+                class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
+                name="paymentType"
+                id="popup-payment-type">
+                <option value="cash" selected>De contado</option>
+                <option value="credit">Financiado</option>
+            </select>
+        </div>
+    </div>
+    <div class="py-1"></div>
+    <div class="flex gap-2">
+        <input type="checkbox" name="consent" id="popup-contact-consent" required>
+        <label for="popup-contact-consent" class="text-stone-900 font-bold text-xs">He leído y acepto los terminos de servicio de colinasdelmar.mx</label>
+    </div>
+    <div class="py-2"></div>
+    <div class="flex">
+        <button 
+            class="bg-orange-500 text-stone-50 font-medium w-full py-2 rounded uppercase"
+            type="submit"
+            id="popup-contact-submit">Enviar</button>
+    </div>
+</form>
 {{end}}
