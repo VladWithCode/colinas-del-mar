@@ -29,6 +29,7 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 	templ, err := template.New("layout.html").ParseFiles(
 		"web/templates/layout.html",
 		"web/templates/index.html",
+		"web/templates/contact-form.html",
 		"web/templates/sections/gallery.html",
 		"web/templates/sections/amenities.html",
 		"web/templates/sections/plan.html",
