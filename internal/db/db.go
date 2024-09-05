@@ -23,7 +23,7 @@ var DB *pgxpool.Pool
 
 func Connect() (*pgxpool.Pool, error) {
 	var err error
-	DB, err = pgxpool.New(context.Background(), os.Getenv("DB_URL"))
+	DB, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		return nil, err
 	}
