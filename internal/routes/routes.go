@@ -15,6 +15,8 @@ func NewRouter() http.Handler {
 	router.Handle("GET /static/", http.StripPrefix("/static/", fs))
 
 	RegisterContactRoutes(router)
+	RegisterLotRoutes(router)
+	RegisterQuoteRoutes(router)
 
 	// 404 & 5xx pages
 	router.HandleFunc("GET /", RenderNotFound)
@@ -27,6 +29,7 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 	templ, err := template.New("layout.html").ParseFiles(
 		"web/templates/layout.html",
 		"web/templates/index.html",
+		"web/templates/contact-form.html",
 		"web/templates/sections/gallery.html",
 		"web/templates/sections/amenities.html",
 		"web/templates/sections/plan.html",
