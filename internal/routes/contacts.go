@@ -50,6 +50,8 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 		date  = time.Now()
 	)
 
+	contacts.LogContactRequest(name, phone, date)
+
 	phone, err = internal.FormatPhone(phone)
 
 	if err != nil {
