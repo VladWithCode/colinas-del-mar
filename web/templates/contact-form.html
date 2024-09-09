@@ -17,7 +17,7 @@
         <label for="consent" class="text-sm">Acepto que se me contacte a través de Whatsapp o llamada teléfonica</label>
     </div>
     {{with .ErrorMessage}}
-    <p class="text-sm text-red-500 font-semibold">{{/* . */}}</p>
+    <p class="text-sm text-red-500 font-semibold">{{.}}</p>
     {{end}}
     {{with .SuccessMessage}}
     <p class="text-sm text-emerald-500 font-semibold">{{.}}</p>

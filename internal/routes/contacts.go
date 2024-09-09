@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/vladwithcode/colinas/internal"
+	"github.com/vladwithcode/colinas/internal/contacts"
 	"github.com/vladwithcode/colinas/internal/db"
 	"github.com/vladwithcode/colinas/internal/whatsapp"
 )
@@ -29,6 +30,7 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		w.Header().Add("X-ForceSwap", "true")
 		w.WriteHeader(500)
 		err = templ.ExecuteTemplate(
 			w,
@@ -40,8 +42,8 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
-			return
 		}
+		return
 	}
 
 	var (
@@ -58,6 +60,7 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Parse form err: %v\n", err)
 		templ, _ := template.ParseFiles("web/templates/contact-form.html")
 
+		w.Header().Add("X-ForceSwap", "true")
 		w.WriteHeader(400)
 		err = templ.ExecuteTemplate(
 			w,
@@ -69,8 +72,8 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
-			return
 		}
+		return
 	}
 
 	id, _ := uuid.NewV7()
@@ -89,6 +92,7 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("err: %v\n", err)
 		templ, _ := template.ParseFiles("web/templates/contact-form.html")
 
+		w.Header().Add("X-ForceSwap", "true")
 		w.WriteHeader(500)
 		err = templ.ExecuteTemplate(
 			w,
@@ -100,8 +104,8 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
-			return
 		}
+		return
 	}
 
 	templ, err := template.ParseFiles("web/templates/contact-form.html")
