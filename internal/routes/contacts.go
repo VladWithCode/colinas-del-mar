@@ -47,9 +47,9 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 	var (
 		name  = r.Form.Get("name")
 		phone = r.Form.Get("phone")
+		date  = time.Now()
 	)
 
-	date := time.Now()
 	phone, err = internal.FormatPhone(phone)
 
 	if err != nil {
