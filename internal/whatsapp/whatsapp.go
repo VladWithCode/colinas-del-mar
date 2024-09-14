@@ -122,11 +122,6 @@ func SendNewContactNotification(contactData *db.Contact) error {
 	)
 
 	createdDateStr := contactData.CreatedAt.Format("2006-01-02 03:04pm")
-
-	headerVars = append(headerVars, TemplateVar{
-		"type": "text",
-		"text": contactData.Name,
-	})
 	bodyVars = append(bodyVars, TemplateVar{
 		"type": "text",
 		"text": contactData.Name,

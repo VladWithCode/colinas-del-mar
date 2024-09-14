@@ -1,20 +1,21 @@
 package routes
 
 import (
-	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/vladwithcode/colinas/internal"
+	"github.com/vladwithcode/colinas/internal/contacts"
 	"github.com/vladwithcode/colinas/internal/db"
 	"github.com/vladwithcode/colinas/internal/whatsapp"
 )
 
 func RegisterContactRoutes(router *http.ServeMux) {
 	router.HandleFunc("POST /api/contact", CreateNewContact)
+	router.HandleFunc("POST /api/contact/lot", CreateNewContact)
 }
 
 func CreateNewContact(w http.ResponseWriter, r *http.Request) {
@@ -22,13 +23,14 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		fmt.Printf("Parse form err: %v\n", err)
-		templ, err := template.ParseFiles("web/templates/layout.html")
+		templ, err := template.ParseFiles("web/templates/contact-form.html")
 
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
 			return
 		}
 
+		w.Header().Add("X-ForceSwap", "true")
 		w.WriteHeader(500)
 		err = templ.ExecuteTemplate(
 			w,
@@ -40,22 +42,25 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
-			return
 		}
+		return
 	}
 
 	var (
 		name  = r.Form.Get("name")
 		phone = r.Form.Get("phone")
+		date  = time.Now()
 	)
 
-	date := time.Now()
-	phone, err = formatPhone(phone)
+	contacts.LogContactRequest(name, phone, date)
+
+	phone, err = internal.FormatPhone(phone)
 
 	if err != nil {
 		fmt.Printf("Parse form err: %v\n", err)
-		templ, _ := template.ParseFiles("web/templates/layout.html")
+		templ, _ := template.ParseFiles("web/templates/contact-form.html")
 
+		w.Header().Add("X-ForceSwap", "true")
 		w.WriteHeader(400)
 		err = templ.ExecuteTemplate(
 			w,
@@ -67,8 +72,8 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
-			return
 		}
+		return
 	}
 
 	id, _ := uuid.NewV7()
@@ -84,8 +89,10 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 	err = whatsapp.SendNewContactNotification(&contact)
 
 	if err != nil {
-		templ, _ := template.ParseFiles("web/templates/layout.html")
+		fmt.Printf("err: %v\n", err)
+		templ, _ := template.ParseFiles("web/templates/contact-form.html")
 
+		w.Header().Add("X-ForceSwap", "true")
 		w.WriteHeader(500)
 		err = templ.ExecuteTemplate(
 			w,
@@ -97,14 +104,14 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
-			return
 		}
+		return
 	}
 
-	w.WriteHeader(201)
-	templ, err := template.ParseFiles("web/templates/layout.html")
+	templ, err := template.ParseFiles("web/templates/contact-form.html")
 
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
 		return
 	}
@@ -118,22 +125,11 @@ func CreateNewContact(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if err != nil {
+		fmt.Printf("err: %v\n", err)
 		RespondWithError(w, http.StatusInternalServerError, ErrorParams{})
 		return
 	}
 }
 
-func formatPhone(p string) (string, error) {
-	stripCountryCodeExp := regexp.MustCompile(`^\+52`)
-	replaceExp := regexp.MustCompile(`[ -]`)
-	numExp := regexp.MustCompile(`[0-9]{10}`)
-
-	phone := stripCountryCodeExp.ReplaceAll([]byte(p), []byte(""))
-	phone = replaceExp.ReplaceAll([]byte(phone), []byte(""))
-
-	if !numExp.Match(phone) {
-		return "", errors.New(fmt.Sprintf("The string is not a valid phone number: %v", p))
-	}
-
-	return string(phone), nil
+func CreateNewContactWithLot(w http.ResponseWriter, r *http.Request) {
 }

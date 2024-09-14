@@ -195,6 +195,13 @@
         if (mql.matches) {
             map.setZoom(14)
         }
+
+        htmx.on("htmx:beforeSwap", e => {
+            let t = e.detail.xhr.getResponseHeader("X-ForceSwap")
+            if (t) {
+                e.detail.shouldSwap = "outerHTML"
+            }
+        })
     })
 </script>
 <div class="relative h-dvh pt-16 px-4 z-0 overflow-hidden" id="hero-wrapper">
@@ -302,13 +309,16 @@
 		</div>
 		<p class="text-lg text-center font-semibold">Areas Recreativas</p>
 		<p class="w-[34ch] max-w-full mx-auto">
+			Descubre un estilo de vida donde el bienestar
+            y la diversión se encuentran en un solo lugar.
             Colinas del Mar cuenta con áreas recreativas diseñadas para ti y tu familia:
-            una piscina cristalina para refrescarte, una palapa rodeada de naturaleza, y mucho más.
+            como una piscina cristalina para refrescarte,
+            una palapa rodeada de naturaleza, y mucho más.
         </p>
 	</div>
 </section>
 <!-- Availability Plan -->
-{{/* {{template "plan"}} */}}
+{{/* template "plan"*/}}
 
 <section class="relative z-0 p-10 space-y-6">
 	<!-- TODO: Picture -->
@@ -319,13 +329,13 @@
 		A ti que buscas no solo un espacio para vivir, sino una inversión
 		segura, Colinas del Mar es tu opción más rentable del mercado por su
 		valor costo/beneficio. Gracias a la gran ubicación con la que cuenta,
-		con una conectividad inigualable, fluidez vial, zona segura y una serie
+		con una conectividad inigualable, fluidez vial y una serie
 		de amenidades irresistibles.
 	</p>
 	<div class="shadow-lg shadow-stone-100 space-y-8 p-4">
 		<div class="space-y-4 px-5">
 			<h3 class="text-2xl text-center font-black uppercase">
-				Desde 280 M<sup>2</sup>
+				Desde 96 M<sup>2</sup>
 			</h3>
 			<p class="max-w-[80ch] text-center mx-auto">
                 Nuestros lotes promedio son de 96m<sup>2</sup>, sin embargo, contamos con
@@ -437,7 +447,7 @@
                         fill="#fff"></path>
                     </svg>
                 </div>
-                <p class="">669-112-9742</p>
+                <p class="">669-458-8259</p>
             </div>
             <div class="flex items-center gap-6 pl-6 pr-4">
                 <div class="">

@@ -14,6 +14,8 @@ type Contact struct {
 	Pending    bool      `json:"pending" db:"pending"`
 	CreatedAt  time.Time `json:"createdAt" db:"created_at"`
 	AssignedTo string    `json:"assignedTo" db:"assign_to"`
+	LotNum     string    `json:"lotNum" db:"lot_num"`
+	Mz         string    `json:"mz" db:"mz"`
 }
 
 func CreateContact(contact *Contact) error {
@@ -29,13 +31,12 @@ func CreateContact(contact *Contact) error {
 	id, _ := uuid.NewV7()
 	_, err = conn.Exec(
 		ctx,
-		"INSERT INTO contacts (id, name, phone, pending, created_at, assigned_to) VALUES $1, $2, $3, $4, $5, $6",
+		"INSERT INTO contacts (id, name, phone, pending, created_at) VALUES $1, $2, $3, $4, $5",
 		id,
 		contact.Name,
 		contact.Phone,
 		contact.Pending,
 		contact.CreatedAt,
-		contact.AssignedTo,
 	)
 
 	contact.Id = id.String()

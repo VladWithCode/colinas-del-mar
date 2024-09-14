@@ -1,0 +1,7 @@
+#############################
+
+Solicitud con fecha {{.Date}}
+Nombre: {{.Name}}
+Telefono: {{.Phone}}
+
+#############################
