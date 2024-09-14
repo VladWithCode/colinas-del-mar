@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"text/template"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -12,6 +13,7 @@ import (
 
 func RegisterLotRoutes(r *http.ServeMux) {
 	r.HandleFunc("POST /api/lots", RegisterLots)
+	r.HandleFunc("GET /api/lots/:lt/:mz", GetLotByLtMz)
 }
 
 func RegisterLots(w http.ResponseWriter, r *http.Request) {
@@ -53,4 +55,39 @@ func RegisterLots(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(201)
 	w.Write([]byte("OK"))
+}
+
+func GetLotByLtMz(w http.ResponseWriter, r *http.Request) {
+	lt := r.PathValue("lt")
+	mz := r.PathValue("mz")
+
+	lot, err := db.GetLotByLtMz(lt, mz)
+
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		RespondWithError(w, 500, ErrorParams{Message: "Lot Id not found"})
+		return
+	}
+
+	templ, err := template.ParseFiles("web/templates/sections/plan.html")
+
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		RespondWithError(w, 500, ErrorParams{Message: "Error parsing template"})
+		return
+	}
+
+	err = templ.ExecuteTemplate(
+		w,
+		"popup-content",
+		map[string]any{
+			"Lot": lot,
+		},
+	)
+
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		RespondWithError(w, 500, ErrorParams{Message: "Error executing template"})
+		return
+	}
 }
