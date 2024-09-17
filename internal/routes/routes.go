@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+
+	"github.com/vladwithcode/colinas/internal/db"
 )
 
 func NewRouter() http.Handler {
@@ -26,6 +28,13 @@ func NewRouter() http.Handler {
 }
 
 func RenderIndex(w http.ResponseWriter, r *http.Request) {
+	lots, err := db.GetLots()
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		RespondWithError(w, 500, ErrorParams{})
+		return
+	}
+
 	templ, err := template.New("layout.html").ParseFiles(
 		"web/templates/layout.html",
 		"web/templates/index.html",
@@ -41,7 +50,24 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = templ.Execute(w, nil)
+	lotMap := map[string]db.Lot{}
+
+	for _, lot := range lots {
+		id := fmt.Sprintf("Lt-%v_Mz-%v", lot.Lt, lot.Mz)
+
+		lotMap[id] = *lot
+	}
+
+	err = templ.Execute(w, map[string]any{
+		"Lot": map[string]any{
+			"PriceCash":   172800,
+			"PriceCredit": 192000,
+			"Lt":          1,
+			"Mz":          1,
+			"Available":   true,
+		},
+		"Lots": lotMap,
+	})
 
 	if err != nil {
 		fmt.Printf("err: %v\n", err)

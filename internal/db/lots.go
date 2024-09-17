@@ -20,6 +20,40 @@ type Lot struct {
 	BatchId     string  `json:"batchId" db:"batch_id"`
 }
 
+func GetLots() ([]*Lot, error) {
+	conn, err := GetPool()
+
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	var lots []*Lot
+
+	rows, err := conn.Query(ctx, "SELECT id, lt, mz, available FROM lots")
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var lot Lot
+		err = rows.Scan(
+			&lot.Id,
+			&lot.Lt,
+			&lot.Mz,
+			&lot.Available,
+		)
+
+		lots = append(lots, &lot)
+	}
+
+	return lots, nil
+}
+
 func GetLotByLtMz(lt, mz string) (*Lot, error) {
 	conn, err := GetPool()
 	if err != nil {

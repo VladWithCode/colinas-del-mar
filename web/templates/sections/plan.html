@@ -1,6 +1,6 @@
 {{define "plan"}}
 <script>
-    const LOT_DATA = {{.LotData}}
+    const LOT_DATA = {{.Lots}}
     document.addEventListener("DOMContentLoaded", () => {
         let planObject = document.getElementById("plan-object")
         let zoomInBtn = document.getElementById("plan-zoom-in")
@@ -21,6 +21,19 @@
             ]
 
             for (let lot of lots) {
+                let { mz, lt } = parseLotId(lot.id)
+                if (!lt || !mz) {
+                    continue
+                }
+
+                let dataId = "Lt-"+lt+"_Mz-"+mz
+                let lotData = LOT_DATA[dataId]
+
+                if (!lotData || !lotData.available) {
+                    lot.style.fill = "rgb(190,37,37)"
+                    lot.style.stroke = "rgb(190,37,37)"
+                }
+
                 lot.addEventListener("mouseover", e => {
                     // New svgs separated fill and stroke into different paths
                     // irregularly
@@ -31,43 +44,52 @@
                         activeLot.parentElement.appendChild(activeLot)
                     }
                 })
-                lot.addEventListener("click", e => {
+                lot.addEventListener("click", async e => {
                     e.stopPropagation()
-                    // Reset active tab to 'detail'
-                    let currentTabElem = document.querySelector("[data-popup-tab-active]")
-                    let currentPillBtn = document.querySelector("[data-popup-tab-btn-active]")
-                    let detailTabElem = document.querySelector('[data-popup-tab="detail"]')
-                    let detailPillBtn = document.querySelector('[data-popup-tab-btn="detail"]')
-
-                    if (currentTabElem !== detailTabElem) {
-                        currentTabElem.style.padding = "0px"
-                        currentTabElem.removeAttribute("data-popup-tab-active")
-                        currentPillBtn.classList.remove("text-stone-50", "font-semibold")
-                        currentPillBtn.removeAttribute("data-popup-tab-btn-active")
-                        currentTabElem.style.height = "0px"
-                        currentTabElem.style.visibility = "hidden"
-                        currentTabElem.style.opacity = 0
-
-                        detailTabElem.style.padding = ""
-                        detailTabElem.setAttribute("data-popup-tab-active", true)
-                        detailPillBtn.classList.add("text-stone-50", "font-semibold")
-                        detailPillBtn.setAttribute("data-popup-tab-btn-active", true)
-                        detailTabElem.style.height = ""
-                        detailTabElem.style.visibility = "visible"
-                        detailTabElem.style.opacity = 1
-                    }
-
-                    let planImg = document.getElementById("plan-popup-img")
-                    planImg.src = "/static/img/land-available.webp"
+                    resetActiveTab()
 
                     let contentHeight = document.getElementById("plan-popup-content").scrollHeight
+                    let contentWidth = document.getElementById("plan-popup-content").scrollWidth
                     let tl = gsap.timeline({duration:0.4,ease:"power2.in"})
-                    tl.to("#plan-popup", {autoAlpha:1, duration:0.1})
-                    tl.to("#plan-popup-content", {height:contentHeight+"px"}, "<0.2")
+                    tl.set("#plan-popup-spinner", { height: contentHeight+"px", width: contentWidth+"px" })
+                    tl.to("#plan-popup", { autoAlpha: 1, duration: 0.1 })
+                    tl.from("#plan-popup-spinner", { autoAlpha: 0, scale: 0,  borderRadius: "9999px" })
                     
-
                     document.getElementById("plan-popup-pill").style.left = "0px"
+                    let detailPillBtn = document.querySelector('[data-popup-tab-btn="detail"]')
                     document.getElementById("plan-popup-pill").style.width = detailPillBtn.scrollWidth+"px"
+
+                    let [lt, mz] = lot.id.split("_")
+                    let ltNum = lt.split("-")[1]
+                    let mzNum = mz.split("-")[1]
+
+                    // TODO: Fetch lot data
+                    let res = await fetch("/api/lots/"+ltNum+"/"+mzNum)
+
+                    if (res.ok) {
+                        document.getElementById("plan-popup-content").outerHTML = await res.text()
+                        htmx.process(document.getElementById("plan-popup-content"))
+                        let popupContent = document.getElementById("plan-popup-content")
+                        // Need to re-animate new content
+                        // Give it time for the element height to be updated
+                        gsap.delayedCall(0.1, () => {
+                            contentHeight = popupContent.scrollHeight
+                            gsap.to(popupContent, { height: contentHeight+"px" })
+                        })
+                        document.getElementById("plan-popup-pill").style.left = "0px"
+                        document.getElementById("plan-popup-pill").style.width = detailPillBtn.scrollWidth+"px"
+
+                        let planImg = document.getElementById("plan-popup-img")
+                        planImg.src = "/static/img/land-available.webp"
+
+                        initializePlanPopup()
+                    } else {
+                        let errorNotice = document.getElementById("plan-popup-error")
+                        gsap.to(errorNotice, { autoAlpha: 1, height: errorNotice.scrollHeight+"px" }, "<.2")
+
+                    }
+
+                    tl.to("#plan-popup-spinner", { autoAlpha: 0, scale: 0, duration: .5 })
                 })
 
             }
@@ -78,6 +100,32 @@
                 }
                 planDoc.getElementById("plan-sat").style.opacity = 1
             })
+
+            // Resets active tab to 'detail'
+            function resetActiveTab() {
+                let currentTabElem = document.querySelector("[data-popup-tab-active]")
+                let currentPillBtn = document.querySelector("[data-popup-tab-btn-active]")
+                let detailTabElem = document.querySelector('[data-popup-tab="detail"]')
+                let detailPillBtn = document.querySelector('[data-popup-tab-btn="detail"]')
+
+                if (currentTabElem !== detailTabElem) {
+                    currentTabElem.style.padding = "0px"
+                    currentTabElem.removeAttribute("data-popup-tab-active")
+                    currentPillBtn.classList.remove("text-stone-50", "font-semibold")
+                    currentPillBtn.removeAttribute("data-popup-tab-btn-active")
+                    currentTabElem.style.height = "0px"
+                    currentTabElem.style.visibility = "hidden"
+                    currentTabElem.style.opacity = 0
+
+                    detailTabElem.style.padding = ""
+                    detailTabElem.setAttribute("data-popup-tab-active", true)
+                    detailPillBtn.classList.add("text-stone-50", "font-semibold")
+                    detailPillBtn.setAttribute("data-popup-tab-btn-active", true)
+                    detailTabElem.style.height = ""
+                    detailTabElem.style.visibility = "visible"
+                    detailTabElem.style.opacity = 1
+                }
+            }
         })
         
         zoomInBtn.addEventListener("click", () => {
@@ -91,13 +139,18 @@
         })
 
         let planPopup = document.getElementById("plan-popup")
-        let planPopupContent = document.getElementById("plan-popup-content")
-        let closePopup = document.getElementById("plan-popup-close-btn")
+        planPopup.addEventListener("click", e => {
+            if (e.target !== planPopup) {
+                return
+            }
 
-        closePopup.addEventListener("click", () => {
-            let tl = gsap.timeline({duration:0.4,ease:"power2.in"})
-            tl.to(planPopupContent, {height:"0px"})
-            tl.to(planPopup, {autoAlpha:0}, "<0.2")
+            gsap.to("#plan-popup-content", { height: "0px" })
+            gsap.to(planPopup, { autoAlpha: 0 })
+        })
+        let planPopupErrorClose = document.getElementById("plan-popup-error-close")
+        planPopupErrorClose.addEventListener("click", () => {
+            gsap.to("#plan-popup-error", { autoAlpha: 0, height: "0px" })
+            gsap.to(planPopup, { autoAlpha: 0 })
         })
 
         function parseLotId(id) {
@@ -106,162 +159,188 @@
                 lt: "",
             }
 
-            let [mzStr, ltStr] = id.split("_")
-            lotData.mz = mzStr.split("-")[1]
-            lotData.lt = ltStr.split("-")[1]
+            let [ltStr, mzStr] = id.split("_")
+            if (ltStr) {
+                lotData.lt = ltStr.split("-")[1]
+            }
+            if (mzStr) {
+                lotData.mz = mzStr.split("-")[1]
+            }
 
             return lotData
         }
 
-        // Popup Tabs
-        let contactNowBtn = document.getElementById("popup-contact-now-btn")
-        let calcCreditBtn = document.getElementById("popup-calc-credit-btn")
-        let bookPriceBtn = document.getElementById("credit-book-price-btn")
-        let popupPill = document.getElementById("plan-popup-pill")
-        let popupTabBtns = document.querySelectorAll("[data-popup-tab-btn]")
+        // Popup
+        function initializePlanPopup() {
+            let planPopupContent = document.getElementById("plan-popup-content")
+            let closePopup = document.getElementById("plan-popup-close-btn")
 
-        // Force pill to be btn sized
-        popupPill.style.width = popupTabBtns[0].clientWidth + "px"
-        // Force save initial scrollHeight for tabs
-        let popupTabs = document.querySelectorAll("[data-popup-tab]")
-        for (let tab of popupTabs) {
-            tab.dataset.scrollHeight = tab.scrollHeight
-            if (!tab.hasAttribute("[data-popup-tab-active]")) {
-                tab.style.padding = "0px"
-            }
-        }
+            closePopup.addEventListener("click", () => {
+                let tl = gsap.timeline({duration:0.4,ease:"power2.in"})
+                tl.to(planPopupContent, {height:"0px"})
+                tl.to(planPopup, {autoAlpha:0}, "<0.2")
+                // TODO: Unhide loading spinner
+                tl.to("#plan-popup-spinner", { autoAlpha: 1, scale: 1, borderRadius: "" })
+            })
 
-        contactNowBtn.addEventListener("click", handleTabChange)
-        calcCreditBtn.addEventListener("click", handleTabChange)
-        bookPriceBtn.addEventListener("click", handleTabChange)
+            // Popup Tabs
+            let contactNowBtn = document.getElementById("popup-contact-now-btn")
+            let calcCreditBtn = document.getElementById("popup-calc-credit-btn")
+            let bookPriceBtn = document.getElementById("credit-book-price-btn")
+            let seeMoreBtn = document.getElementById("popup-see-more-btn")
+            let popupPill = document.getElementById("plan-popup-pill")
+            let popupTabBtns = document.querySelectorAll("[data-popup-tab-btn]")
 
-        for (let tabBtn of popupTabBtns) {
-            tabBtn.addEventListener("click", handleTabChange)
-        }
+            // Force pill to be btn sized
+            popupPill.style.width = popupTabBtns[0].clientWidth + "px"
+            // Force save initial scrollHeight for tabs
+            gsap.delayedCall(0.1, () => {
+                let popupTabs = document.querySelectorAll("[data-popup-tab]")
+                for (let tab of popupTabs) {
+                    tab.dataset.scrollHeight = tab.scrollHeight
+                    if (!tab.hasAttribute("[data-popup-tab-active]")) {
+                        tab.style.padding = "0px"
+                    }
+                }
+            })
 
-        function handleTabChange(e) {
-            e.preventDefault()
-            // Reset contentHeight so animations work
-            planPopupContent.style.height = ""
+            contactNowBtn.addEventListener("click", handleTabChange)
+            calcCreditBtn.addEventListener("click", handleTabChange)
+            bookPriceBtn.addEventListener("click", handleTabChange)
 
-            let targetTabId = e.target.dataset.popupTabBtn || e.target.dataset.popupTabCta
-            let targetTabElem = document.querySelector('[data-popup-tab="'+targetTabId+'"]')
-            let targetPillBtn = document.querySelector('[data-popup-tab-btn="'+targetTabId+'"]')
-            let currentTabElem = document.querySelector('[data-popup-tab-active]')
-            let currentPillBtn = document.querySelector('[data-popup-tab-btn-active]')
-
-            if (!targetTabElem) {
-                // TODO: Change tab to detail | display some error
-                return
-            }
-
-            let tl = gsap.timeline({ ease: "power2.in" })
-            if (currentTabElem) {
-                tl.to(currentTabElem, { height: "0px", autoAlpha: 0, duration: 0.4 })
-                currentTabElem.style.padding = "0px"
-                currentTabElem.removeAttribute("data-popup-tab-active")
-                currentPillBtn.classList.remove("text-stone-50", "font-semibold")
-                currentPillBtn.removeAttribute("data-popup-tab-btn-active")
+            for (let tabBtn of popupTabBtns) {
+                tabBtn.addEventListener("click", handleTabChange)
             }
 
-            targetTabElem.style.padding = ""
-            targetPillBtn.classList.add("text-stone-50", "font-semibold")
-            tl.to(targetTabElem, { 
-                height: targetTabElem.dataset.scrollHeight+"px",
-                autoAlpha: 1,
-                duration: 0.4
-            }, "<0.1")
-            tl.to(popupPill, {
-                left: targetPillBtn.offsetLeft+"px", 
-                width: targetPillBtn.scrollWidth+"px"
-            },"<")
+            function handleTabChange(e) {
+                e.preventDefault()
+                // Reset contentHeight so animations work
+                planPopupContent.style.height = ""
 
-            targetTabElem.dataset.popupTabActive = true
-            targetPillBtn.dataset.popupTabBtnActive = true
-        }
+                let targetTabId = e.target.dataset.popupTabBtn || e.target.dataset.popupTabCta
+                let targetTabElem = document.querySelector('[data-popup-tab="'+targetTabId+'"]')
+                let targetPillBtn = document.querySelector('[data-popup-tab-btn="'+targetTabId+'"]')
+                let currentTabElem = document.querySelector('[data-popup-tab-active]')
+                let currentPillBtn = document.querySelector('[data-popup-tab-btn-active]')
 
-        // Credit Calc
-        const priceFormatter = new Intl.NumberFormat("es-MX", {style:"currency",currency:"MXN",minimumFractionDigits:2,maximumFractionDigits:2})
-        const DEFAULT_PRICE = 192_000
-        const PRICE_BY_TIME = {
-            "3": 192_000,
-            "6": 192_000,
-            "12": 192_000,
-            "18": 192_000,
-            "24": 192_000,
-            "32": 192_000,
-            "48": 192_000,
-        }
-        const MIN_CRED_DEPOSIT = 24_000
-        let creditPriceElem = document.getElementById("credit-current-total")
-        let creditDepositInp = document.getElementById("credit-deposit")
-        let creditTimeSelect = document.getElementById("credit-time")
-        let creditInterestElem = document.getElementById("credit-interest")
-        let creditInstallmentElem = document.getElementById("credit-installment")
+                if (!targetTabElem) {
+                    // TODO: Change tab to detail | display some error
+                    return
+                }
 
-        let currentCreditTime = Number(creditTimeSelect.value)
-        let currentTotal = PRICE_BY_TIME[currentCreditTime] || DEFAULT_PRICE
-        creditPriceElem.dataset.creditTotal = currentTotal
+                let tl = gsap.timeline({ ease: "power2.in" })
+                if (currentTabElem) {
+                    tl.to(currentTabElem, { height: "0px", autoAlpha: 0, duration: 0.4 })
+                    currentTabElem.style.padding = "0px"
+                    currentTabElem.removeAttribute("data-popup-tab-active")
+                    currentPillBtn.classList.remove("text-stone-50", "font-semibold")
+                    currentPillBtn.removeAttribute("data-popup-tab-btn-active")
+                }
 
-        let remainingBalance = currentTotal - Number(creditDepositInp.value)
-        creditInstallmentElem.dataset.creditInstallment = Math.ceil(remainingBalance/currentCreditTime)
+                targetTabElem.style.padding = ""
+                targetPillBtn.classList.add("text-stone-50", "font-semibold")
+                tl.to(targetTabElem, { 
+                    height: targetTabElem.dataset.scrollHeight+"px",
+                    autoAlpha: 1,
+                    duration: 0.4
+                }, "<0.1")
+                tl.to(popupPill, {
+                    left: targetPillBtn.offsetLeft+"px", 
+                    width: targetPillBtn.scrollWidth+"px"
+                },"<")
 
-        renderCreditChange()
-
-        creditDepositInp.addEventListener("change", e => {
-            let val = Number(e.target.value)
-            if (isNaN(val) || val < MIN_CRED_DEPOSIT) {
-                creditDepositInp.value = MIN_CRED_DEPOSIT
-                alert("El anticipo minimo es de $24,000.00 MXN")
-                return
+                targetTabElem.dataset.popupTabActive = true
+                targetPillBtn.dataset.popupTabBtnActive = true
             }
 
-            let credTime = creditTimeSelect.value
-            let credTotal = PRICE_BY_TIME[credTime] || DEFAULT_PRICE
-            creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, val, credTime)
+            seeMoreBtn.addEventListener("click", e => {
+                gsap.to("#plan-popup-content", { autoAlpha: 0, height: "0px" })
+                gsap.to("#plan-popup", { autoAlpha: 0 })
+            })
+
+            // Credit Calc
+            const priceFormatter = new Intl.NumberFormat("es-MX", {style:"currency",currency:"MXN",minimumFractionDigits:2,maximumFractionDigits:2})
+            const DEFAULT_PRICE = 192_000
+            const PRICE_BY_TIME = {
+                "3": 192_000,
+                "6": 192_000,
+                "12": 192_000,
+                "18": 192_000,
+                "24": 192_000,
+                "32": 192_000,
+                "48": 192_000,
+            }
+            const MIN_CRED_DEPOSIT = 24_000
+            let creditPriceElem = document.getElementById("credit-current-total")
+            let creditDepositInp = document.getElementById("credit-deposit")
+            let creditTimeSelect = document.getElementById("credit-time")
+            let creditInterestElem = document.getElementById("credit-interest")
+            let creditInstallmentElem = document.getElementById("credit-installment")
+
+            let currentCreditTime = Number(creditTimeSelect.value)
+            let currentTotal = PRICE_BY_TIME[currentCreditTime] || DEFAULT_PRICE
+            creditPriceElem.dataset.creditTotal = currentTotal
+
+            let remainingBalance = currentTotal - Number(creditDepositInp.value)
+            creditInstallmentElem.dataset.creditInstallment = Math.ceil(remainingBalance/currentCreditTime)
+
             renderCreditChange()
-        })
-        creditTimeSelect.addEventListener("change", e => {
-            let val = e.target.value
-            let credTotal = PRICE_BY_TIME[val] || DEFAULT_PRICE
-            let credDeposit = creditDepositInp.value
-            creditPriceElem.dataset.creditTotal = credTotal
-            creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, credDeposit, val)
-            renderCreditChange()
-        })
 
-        function calcCreditInstallment(creditTotal, deposit, creditTime) {
-            let remainingBalance = creditTotal - deposit
-            if (remainingBalance < 0) {
-                return 0
+            creditDepositInp.addEventListener("change", e => {
+                let val = Number(e.target.value)
+                if (isNaN(val) || val < MIN_CRED_DEPOSIT) {
+                    creditDepositInp.value = MIN_CRED_DEPOSIT
+                    alert("El anticipo minimo es de $24,000.00 MXN")
+                    return
+                }
+
+                let credTime = creditTimeSelect.value
+                let credTotal = PRICE_BY_TIME[credTime] || DEFAULT_PRICE
+                creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, val, credTime)
+                renderCreditChange()
+            })
+            creditTimeSelect.addEventListener("change", e => {
+                let val = e.target.value
+                let credTotal = PRICE_BY_TIME[val] || DEFAULT_PRICE
+                let credDeposit = creditDepositInp.value
+                creditPriceElem.dataset.creditTotal = credTotal
+                creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, credDeposit, val)
+                renderCreditChange()
+            })
+
+            function calcCreditInstallment(creditTotal, deposit, creditTime) {
+                let remainingBalance = creditTotal - deposit
+                if (remainingBalance < 0) {
+                    return 0
+                }
+                return Math.ceil(remainingBalance/creditTime)
             }
-            return Math.ceil(remainingBalance/creditTime)
-        }
-        function renderCreditChange() {
-            creditPriceElem.textContent = priceFormatter.format(Number(creditPriceElem.dataset.creditTotal))
-            creditInstallmentElem.textContent = priceFormatter.format(Number(creditInstallmentElem.dataset.creditInstallment))
-        }
-
-        // Contact Form
-        let contactLotNumInp = document.getElementById("popup-contact-lot-num")
-        let contactLotTypeInp = document.getElementById("popup-contact-lot-type")
-        let contactMzInp = document.getElementById("popup-contact-mz")
-        let contactCredTimeInp = document.getElementById("popup-contact-cred-time")
-        let contactCredDepositInp = document.getElementById("popup-contact-cred-deposit")
-        let contactPaymentTypeInp = document.getElementById("popup-payment-type")
-        
-        contactPaymentTypeInp.addEventListener("change", e => {
-            let payType = e.target.value
-
-            if (payType !== "credit") {
-                contactCredTimeInp.value = ""
-                contactCredDepositInp.value = ""
-                return
+            function renderCreditChange() {
+                creditPriceElem.textContent = priceFormatter.format(Number(creditPriceElem.dataset.creditTotal))
+                creditInstallmentElem.textContent = priceFormatter.format(Number(creditInstallmentElem.dataset.creditInstallment))
             }
 
-            contactCredTimeInp.value = creditTimeSelect.value
-            contactCredDepositInp.value = creditDepositInp.value
-        })
+            // Contact Form
+            let contactLotNumInp = document.getElementById("popup-contact-lot-num")
+            let contactLotTypeInp = document.getElementById("popup-contact-lot-type")
+            let contactMzInp = document.getElementById("popup-contact-mz")
+            let contactCredTimeInp = document.getElementById("popup-contact-cred-time")
+            let contactCredDepositInp = document.getElementById("popup-contact-cred-deposit")
+            let contactPaymentTypeInp = document.getElementById("popup-payment-type")
+
+            contactPaymentTypeInp.addEventListener("change", e => {
+                let payType = e.target.value
+
+                if (payType !== "credit") {
+                    contactCredTimeInp.value = ""
+                    contactCredDepositInp.value = ""
+                    return
+                }
+
+                contactCredTimeInp.value = creditTimeSelect.value
+                contactCredDepositInp.value = creditDepositInp.value
+            })
+        }
     })
 </script>
 <section class="z-0 flex flex-col max-w-full  overflow-hidden" id="seccion-plano">
@@ -270,7 +349,23 @@
     <div 
         class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6 invisible" 
         id="plan-popup">
-
+        <!-- Spinner -->
+        <div class="flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 z-20 bg-stone-50 rounded invisible" id="plan-popup-spinner">
+            <img src="/static/img/loading.webp" alt="Icono animado de carga de información del lote" class="w-40 h-40 object-center object-cover">
+            <p class="text-xl text-stone-500 font-semibold">Cargando...</p>
+        </div>
+        <!-- Error -->
+        <div 
+            class="absolute flex flex-col items-center justify-center gap-4 w-96 max-w-[80%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-50 rounded invisible m-auto px-8 py-4"
+            id="plan-popup-error">
+            <svg class="w-32 h-32">
+                <use href="/static/svg/fail.svg#fail"></use>
+            </svg>
+            <p class="text-stone-700 font-semibold text-xl">Ocurrio un error al recuperar el lote</p>
+            <button 
+                class="w-full bg-red-600 py-2 text-stone-50 font-medium rounded"
+                id="plan-popup-error-close">Cerrar</button>
+        </div>
         {{template "popup-content" .}}
     </div>
     <div class="w-full flex-auto px-4">
@@ -303,7 +398,7 @@
 {{define "popup-content"}}
 {{with .Lot}}
 <div 
-    class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden"
+    class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden z-10"
     style="height: 0px"
     id="plan-popup-content">
     <!-- Header -->
@@ -340,7 +435,7 @@
             class="flex flex-col xl:flex-row xl:gap-4 overflow-hidden"
             data-popup-tab="detail"
             data-popup-tab-active>
-            <div class="relative basis-1/2 shrink grow-0 xl:h-auto xl:basis-1/2 xl:shrink xl:grow z-0">
+            <div class="relative basis-1/2 shrink grow-0 xl:basis-1/2 xl:shrink xl:grow z-0">
                 <img
                 src="/static/img/land-thumb.jpg"
                 alt="Representación artistica del terreno que se esta promocionando"
@@ -349,7 +444,7 @@
                 id="plan-popup-img">
             </div>
             <div class="relative basis-1/2 shrink grow xl:h-auto xl:basis-1/3 xl:mx-auto p-2 overflow-y-auto overflow-x-hidden bg-stone-50 z-10">
-                <p class="text-3xl xl:text-5xl font-bold text-indigo-900">${{.PriceCash}}</p>
+                <p class="text-3xl xl:text-5xl font-bold text-indigo-900">{{$.PriceCash}}</p>
                 <div class="py-0.5"></div>
                 <p class="text-lg xl:text-xl text-stone-700 font-semibold">Lote {{.Lt}} Manzana {{.Mz}}</p>
                 <p class="text-sm {{if .Available}}text-emerald-500{{else}}text-red-500{{end}} font-medium xl:text-base">{{if .Available}}Disponible{{else}}No disponible{{end}}</p>
@@ -360,27 +455,33 @@
                             <use href="/static/svg/square.svg#square"></use>
                             </svg> -->
                             <p class="font-bold">Area:</p>
-                            <p class="text-stone-600">90m<sup>2</sup></p>
+                            <p class="text-stone-600">{{.Area}}m<sup>2</sup></p>
                     </li>
                     <li class="xl:text-lg">
                         <p class="font-bold">Dimensiones:</p>
-                        <p class="text-stone-600">6&times;16m</p>
+                        <p class="text-stone-600">{{.Measures}}m</p>
                     </li>
                     <li class="xl:text-lg">
                         <div class="font-bold">Precio/m<sup>2</sup></div>
-                        <p class="text-stone-600">$1,500.00/m<sup>2</sup></p>
+                        <p class="text-stone-600">{{$.PriceMtCash}}/m<sup>2</sup></p>
                     </li>
                 </ul>
                 <div class="py-4"></div>
                 <div class="relative flex flex-col space-y-2 bottom-0" id="popup-cta-wrapper">
                     <button 
-                        class="bg-orange-500 py-2 text-stone-50 font-medium rounded"
+                        class="bg-orange-500 py-2 text-stone-50 font-medium rounded{{if not .Available}} hidden{{end}}"
                         id="popup-contact-now-btn"
-                        data-popup-tab-cta="form">Contactácnos ahora</button>
+                        data-popup-tab-cta="form"
+                        {{if not .Available}}disabled{{end}}>Contactácnos ahora</button>
                     <button
-                        class="bg-indigo-900 py-2 text-stone-50 font-medium rounded"
+                        class="bg-indigo-900 py-2 text-stone-50 font-medium rounded{{if not .Available}} hidden{{end}}"
                         id="popup-calc-credit-btn" 
-                        data-popup-tab-cta="calc">Cotiza tu Financiamiento</button>
+                        data-popup-tab-cta="calc"
+                        {{if not .Available}}disabled{{end}}>Cotiza tu Financiamiento</button>
+                    <button
+                        class="bg-indigo-900 py-2 text-stone-50 font-medium rounded{{if .Available}} hidden{{end}}"
+                        id="popup-see-more-btn"
+                        {{if .Available}}disabled{{end}}>Ver lotes disponibles</button>
                 </div>
             </div>
         </div>
@@ -394,11 +495,11 @@
             <div class="flex gap-2">
                 <div class="basis-1/2 flex-1">
                     <p class="text-sm text-stone-900 font-semibold">Precio<br>de contado</p>
-                    <p class="text-2xl font-bold text-indigo-900 mt-auto">${{.PriceCash}}</p>
+                    <p class="text-2xl font-bold text-indigo-900 mt-auto">{{$.PriceCash}}</p>
                 </div>
                 <div class="basis-1/2 flex-1">
                     <p class="text-sm text-stone-900 font-semibold">Precio <br>Financiado</p>
-                    <p class="text-2xl font-bold text-indigo-900 mt-auto" id="credit-current-total" data-credit-total="{{.PriceCredit}}">${{.PriceCredit}}</p>
+                    <p class="text-2xl font-bold text-indigo-900 mt-auto" id="credit-current-total" data-credit-total="{{.PriceCredit}}">{{$.PriceCredit}}</p>
                 </div>
             </div>
             <div class="py-1"></div>
@@ -472,7 +573,7 @@
 <form
     class="relative p-2 overflow-hidden invisible h-0"
     data-popup-tab="form"
-    hx-post="/api/lot-contact"
+    hx-post="/api/contact"
     hx-swap="outerHTML">
     <input type="hidden" name="lt" id="popup-contact-lot-num" value="{{.Lt}}">
     <input type="hidden" name="mz" id="popup-contact-mz" value="{{.Mz}}">
