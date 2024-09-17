@@ -8,12 +8,13 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/vladwithcode/colinas/internal"
 	"github.com/vladwithcode/colinas/internal/db"
 )
 
 func RegisterLotRoutes(r *http.ServeMux) {
 	r.HandleFunc("POST /api/lots", RegisterLots)
-	r.HandleFunc("GET /api/lots/:lt/:mz", GetLotByLtMz)
+	r.HandleFunc("GET /api/lots/{lt}/{mz}", GetLotByLtMz)
 }
 
 func RegisterLots(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +82,11 @@ func GetLotByLtMz(w http.ResponseWriter, r *http.Request) {
 		w,
 		"popup-content",
 		map[string]any{
-			"Lot": lot,
+			"Lot":           lot,
+			"PriceCash":     internal.FormatMoney(lot.PriceCash),
+			"PriceMtCash":   internal.FormatMoney(lot.PriceCash / lot.Area),
+			"PriceCredit":   internal.FormatMoney(lot.PriceCredit),
+			"PriceMtCredit": internal.FormatMoney(lot.PriceCredit / lot.Area),
 		},
 	)
 
