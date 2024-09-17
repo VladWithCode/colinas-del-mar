@@ -3,7 +3,10 @@ package internal
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"regexp"
+
+	"github.com/leekchan/accounting"
 )
 
 func FormatPhone(p string) (string, error) {
@@ -19,4 +22,11 @@ func FormatPhone(p string) (string, error) {
 	}
 
 	return string(phone), nil
+}
+
+func FormatMoney(amount float64) string {
+	bFloat := big.NewFloat(amount)
+	ac := accounting.Accounting{Symbol: "$", Precision: 2}
+
+	return ac.FormatMoneyBigFloat(bFloat)
 }
