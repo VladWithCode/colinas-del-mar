@@ -1970,6 +1970,10 @@ a[disabled] {
     max-width: 1280px;
   }
 
+  .xl\:max-w-\[75\%\] {
+    max-width: 75%;
+  }
+
   .xl\:shrink {
     flex-shrink: 1;
   }
