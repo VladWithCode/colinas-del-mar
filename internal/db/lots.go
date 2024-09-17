@@ -33,7 +33,7 @@ func GetLotByLtMz(lt, mz string) (*Lot, error) {
 	var lot Lot
 	row := conn.QueryRow(
 		ctx,
-		"SELECT (id, lt, mz, available, area, measures, price_cash, price_credit) WHERE lt = $1, mz = $2",
+		"SELECT id, lt, mz, available, area, measures, price_cash, price_credit FROM lots WHERE lt = $1 AND mz = $2",
 		lt,
 		mz,
 	)
@@ -68,7 +68,7 @@ func CreateLot(lot *Lot) error {
 
 	_, err = conn.Exec(
 		ctx,
-		"INSERT INTO properties (id, lt, mz, available, area, measures, type, price_cash, price_credit) VALUES $1, $2, $3, $4, $5, $6, $7, $8",
+		"INSERT INTO lots (id, lt, mz, available, area, measures, type, price_cash, price_credit) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 		lot.Id,
 		lot.Lt,
 		lot.Mz,
@@ -106,10 +106,11 @@ func BatchCreateLot(b *pgx.Batch) error {
 
 func QueueCreateLot(b *pgx.Batch, lot *Lot) {
 	b.Queue(
-		"INSERT INTO properties (id, lt, mz, available, area, measures, type, price_cash, price_credit, batch_id) VALUES $1, $2, $3, $4, $5, $6, $7, $8, $9, $10",
+		"INSERT INTO lots (id, lt, mz, available, area, measures, type, price_cash, price_credit, batch_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
 		lot.Id,
 		lot.Lt,
 		lot.Mz,
+		true,
 		lot.Area,
 		lot.Measures,
 		lot.Type,
