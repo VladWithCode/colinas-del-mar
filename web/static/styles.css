@@ -1940,10 +1940,6 @@ a[disabled] {
     max-width: 50%;
   }
 
-  .xl\:max-w-\[75\%\] {
-    max-width: 75%;
-  }
-
   .xl\:max-w-screen-lg {
     max-width: 1024px;
   }

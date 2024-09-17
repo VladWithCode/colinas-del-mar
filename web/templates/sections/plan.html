@@ -12,8 +12,8 @@
         })
         planObject.addEventListener("load", () => {
             let planDoc = planObject.contentDocument
-            let lotWrapper = planDoc.getElementById("Lt")
-            let lots = planDoc.querySelectorAll("#Lt>path")
+            let lotWrapper = planDoc.getElementById("mzt-plan-svg")
+            let lots = planDoc.querySelectorAll("[data-lot-svg]")
             let planRect = planObject.getClientRects()[0]
             let planCenter = [
                 planRect.width * .5,
@@ -22,11 +22,13 @@
 
             for (let lot of lots) {
                 lot.addEventListener("mouseover", e => {
-                    lotWrapper.appendChild(lot)
+                    // New svgs separated fill and stroke into different paths
+                    // irregularly
+                    lot.parentElement.appendChild(lot)
 
                     let activeLot = planDoc.querySelector(".active-lot")
                     if (activeLot) {
-                        lotWrapper.appendChild(activeLot)
+                        activeLot.parentElement.appendChild(activeLot)
                     }
                 })
                 lot.addEventListener("click", e => {
@@ -276,7 +278,7 @@
         <div class="relative w-full max-w-screen-xl mx-auto z-0 rounded overflow-hidden">
             <object
                 id="plan-object"
-                data="/static/svg/plan.svg"
+                data="/static/svg/plan-new.svg"
                 type="image/svg+xml"
                 class="w-full max-h-[80vh] object-center">
             </object>
@@ -347,7 +349,7 @@
                 id="plan-popup-img">
             </div>
             <div class="relative basis-1/2 shrink grow xl:h-auto xl:basis-1/3 xl:mx-auto p-2 overflow-y-auto overflow-x-hidden bg-stone-50 z-10">
-                <p class="text-3xl xl:text-5xl font-bold text-indigo-900">${{FormatPrice .PriceCash}}</p>
+                <p class="text-3xl xl:text-5xl font-bold text-indigo-900">${{.PriceCash}}</p>
                 <div class="py-0.5"></div>
                 <p class="text-lg xl:text-xl text-stone-700 font-semibold">Lote {{.Lt}} Manzana {{.Mz}}</p>
                 <p class="text-sm {{if .Available}}text-emerald-500{{else}}text-red-500{{end}} font-medium xl:text-base">{{if .Available}}Disponible{{else}}No disponible{{end}}</p>
@@ -392,11 +394,11 @@
             <div class="flex gap-2">
                 <div class="basis-1/2 flex-1">
                     <p class="text-sm text-stone-900 font-semibold">Precio<br>de contado</p>
-                    <p class="text-2xl font-bold text-indigo-900 mt-auto">$172,800.00</p>
+                    <p class="text-2xl font-bold text-indigo-900 mt-auto">${{.PriceCash}}</p>
                 </div>
                 <div class="basis-1/2 flex-1">
                     <p class="text-sm text-stone-900 font-semibold">Precio <br>Financiado</p>
-                    <p class="text-2xl font-bold text-indigo-900 mt-auto" id="credit-current-total" data-credit-total="192_000.00">$192,000.00</p>
+                    <p class="text-2xl font-bold text-indigo-900 mt-auto" id="credit-current-total" data-credit-total="{{.PriceCredit}}">${{.PriceCredit}}</p>
                 </div>
             </div>
             <div class="py-1"></div>
@@ -452,6 +454,15 @@
         </div>
 
         {{template "popup-form" .}}
+    </div>
+</div>
+{{else}}
+<div 
+    class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden"
+    style="height: 0px"
+    id="plan-popup-content">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <h2 class="text-2xl font-bold">Ocurrio un error al recuperar el lote</h2>
     </div>
 </div>
 {{end}}
