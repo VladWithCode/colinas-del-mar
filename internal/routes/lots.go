@@ -32,16 +32,29 @@ func RegisterLots(w http.ResponseWriter, r *http.Request) {
 	for _, lot := range lotsData {
 		newLot := db.Lot{}
 		id, _ := uuid.NewV7()
+
 		newLot.Id = id.String()
 		newLot.Lt = lot["lt"].(string)
 		newLot.Mz = lot["mz"].(string)
 		newLot.Area = lot["area"].(float64)
 		newLot.Measures = lot["measures"].(string)
 		newLot.Type = lot["type"].(string)
-		newLot.PriceCash = lot["priceCash"].(float64)
-		newLot.PriceCredit = lot["priceCredit"].(float64)
 		newLot.BatchId = batchId.String()
 
+		priceCash := db.SQMT_PRICE_CASH * newLot.Area
+		priceCredit := db.SQMT_PRICE_CREDIT * newLot.Area
+		priceCashStr := lot["priceCash"]
+		priceCreditStr := lot["priceCredit"]
+
+		if priceCashStr != nil {
+			priceCash = priceCashStr.(float64)
+		}
+		if priceCreditStr != nil {
+			priceCredit = priceCreditStr.(float64)
+		}
+
+		newLot.PriceCash = priceCash
+		newLot.PriceCredit = priceCredit
 		db.QueueCreateLot(&lotBatch, &newLot)
 	}
 
