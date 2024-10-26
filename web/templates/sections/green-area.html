@@ -2,29 +2,64 @@
     <script src="/static/js/InfiniteSlider-v2a3wzx6.js" async></script>
     <script type="module">
         document.addEventListener("DOMContentLoaded", () => {
-            let slider = new InfiniteSlider("[data-green-area-slider]", {
-                skipBulletBtns: true,
+            let planObject = document.getElementById("plan-object")
+            planObject.addEventListener("load", () => {
+                let planDoc = planObject.contentDocument
+                let greenAreaSvg = planDoc.querySelector("[data-green-area-svg]")
+                let closeGreenAreaPopupBtn = document.getElementById("green-area-close-btn")
+
+                greenAreaSvg.addEventListener("click", (e) => {
+                    e.stopPropagation()
+                    let contentElement = document.getElementById("green-area-popup-content")
+
+                    let isPopupActive = contentElement.hasAttribute("data-popup-active")
+                    
+                    toggleGreenAreaPopup(isPopupActive)
+                })
+
+                closeGreenAreaPopupBtn.addEventListener("click", () => {
+                    toggleGreenAreaPopup(true)
+                })
+
+                let slider = new InfiniteSlider("[data-green-area-slider]", {
+                    skipBulletBtns: true,
+                })
+
+                slider.translateSlideToCenter()
+
+                let thumbs = document.querySelectorAll("[data-slider-thumb]")
+
+                for (let t of thumbs) {
+                    t.addEventListener("click", () => {
+                        let idx = Number(t.dataset.sliderThumb)
+
+                        if (!isNaN(idx)) {
+                            slider.goto(idx)
+                        }
+                    })
+                }
             })
 
-            slider.translateSlideToCenter()
+            function toggleGreenAreaPopup(isPopupActive) {
+                let tl = gsap.timeline({duration:0.4,ease:"power2.in"})
+                let contentElement = document.getElementById("green-area-popup-content")
+                let contentHeight = contentElement.scrollHeight
 
-            let thumbs = document.querySelectorAll("[data-slider-thumb]")
+                if (isPopupActive) {
+                    tl.to(contentElement, { height: "0px" })
+                    tl.to(contentElement.parentElement, { autoAlpha: 0 }, "<0.25")
+                    return
+                }
 
-            for (let t of thumbs) {
-                t.addEventListener("click", () => {
-                    let idx = Number(t.dataset.sliderThumb)
-
-                    if (!isNaN(idx)) {
-                        slider.goto(idx)
-                    }
-                })
+                tl.to(contentElement.parentElement, { autoAlpha: 1 })
+                tl.to(contentElement, { height: contentHeight+"px" }, "<0.25")
             }
         })
     </script>
     <div 
-        class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6" 
+        class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6 invisible" 
         id="green-area-popup">
-        <div class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden z-10">
+        <div class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden z-10 h-0" id="green-area-popup-content">
             <!-- Header -->
             <div class="flex justify-between gap-2 shrink grow-0 border-b border-stone-400 py-1.5">
                 <h1 class="text-lg text-stone-800 font-semibold tracking-wide px-4">Area Verde: Comodidades para ti y tu familia</h1>
