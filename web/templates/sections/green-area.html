@@ -1,0 +1,113 @@
+{{define "green-area-popup"}}
+    <script src="/static/js/InfiniteSlider-v2a3wzx6.js" async></script>
+    <script type="module">
+        document.addEventListener("DOMContentLoaded", () => {
+            let slider = new InfiniteSlider("[data-green-area-slider]", {
+                skipBulletBtns: true,
+            })
+
+            slider.translateSlideToCenter()
+
+            let thumbs = document.querySelectorAll("[data-slider-thumb]")
+
+            for (let t of thumbs) {
+                t.addEventListener("click", () => {
+                    let idx = Number(t.dataset.sliderThumb)
+
+                    if (!isNaN(idx)) {
+                        slider.goto(idx)
+                    }
+                })
+            }
+        })
+    </script>
+    <div 
+        class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6" 
+        id="green-area-popup">
+        <div class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden z-10">
+            <!-- Header -->
+            <div class="flex justify-between gap-2 shrink grow-0 border-b border-stone-400 py-1.5">
+                <h1 class="text-lg text-stone-800 font-semibold tracking-wide px-4">Area Verde: Comodidades para ti y tu familia</h1>
+                <div class="w-10 flex items-center justify-center grow-0 shrink">
+                    <button id="green-area-close-btn">
+                        <svg class="h-4 w-4 fill-current">
+                            <use href="/static/svg/times.svg#times"></use>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- Body -->
+            <div class="relative flex flex-col flex-1 p-1.5">
+                <div class="px-3">
+                    <p class="text-stone-700 font-medium">Tenemos planes espectaculares para las areas verdes de Colinas del Mar.</p>
+                    <p class="text-stone-700 font-medium">Aqui tienes una muestra previa de lo que construiremos para brindarles a ti y a tu famila un lugar perfecto para vivir y vacacionar</p>
+                </div>
+                <div class="py-1"></div>
+                <div class="flex-1 w-dvw max-w-full relative select-none" data-green-area-slider>
+                    <!-- Controls -->
+                    <div class="absolute top-1/2 left-2 -translate-y-1/2 z-20">
+                        <button 
+                            id="green-area-slider-prev"
+                            class="flex items-center justify-center bg-slate-800 bg-opacity-60 backdrop-blur-sm rounded-full p-2 shadow-main"
+                            style="box-shadow: 0px 5px 8px -6px var(--tw-shadow-color);"
+                            data-slider-prev>
+                            <svg class="w-6 h-6 stroke-stone-50 rotate-180">
+                                <use href="/static/svg/arrow.svg#arrow"></use>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="absolute top-1/2 right-2 -translate-y-1/2 z-20">
+                        <button
+                            id="green-area-slider-next"
+                            class="flex items-center justify-center bg-slate-800 bg-opacity-60 backdrop-blur-sm rounded-full p-2 shadow-main"
+                            style="box-shadow: 0px 5px 8px -6px var(--tw-shadow-color);"
+                            data-slider-next>
+                            <svg class="w-6 h-6 stroke-stone-50">
+                                <use href="/static/svg/arrow.svg#arrow"></use>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Slides -->
+                    <div class="w-full h-full overflow-hidden rounded-md">
+                        <div class="relative w-full h-full flex overflow-visible" data-slider-slider>
+                            <div class="basis-full grow-0 shrink-0 max-w-full h-full" data-slider-slide="0">
+                                <img class="w-full h-full object-cover object-center" src="/static/img/colinas-1.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                            </div>
+                            <div class="basis-full grow-0 shrink-0 max-w-full h-full" data-slider-slide="1">
+                                <img class="w-full h-full object-cover object-center" src="/static/img/colinas-2.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                            </div>
+                            <div class="basis-full grow-0 shrink-0 max-w-full h-full" data-slider-slide="2">
+                                <img class="w-full h-full object-cover object-center" src="/static/img/colinas-3.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                            </div>
+                            <div class="basis-full grow-0 shrink-0 max-w-full h-full" data-slider-slide="3">
+                                <img class="w-full h-full object-cover object-center" src="/static/img/colinas-4.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                            </div>
+                            <div class="basis-full grow-0 shrink-0 max-w-full h-full" data-slider-slide="4">
+                                <img class="w-full h-full object-cover object-center" src="/static/img/colinas-5.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="max-w-full h-36 flex gap-2 overflow-x-auto overflow-y-hidden py-2">
+                    <div class="basis-64 grow-0 shrink-0 w-64 h-full" data-slider-thumb="0">
+                        <img class="w-full h-full object-cover object-center rounded cursor-pointer hover:scale-105 transition-[transform]" src="/static/img/colinas-1.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                    </div>
+                    <div class="basis-64 grow-0 shrink-0 w-64 h-full" data-slider-thumb="1">
+                        <img class="w-full h-full object-cover object-center rounded cursor-pointer hover:scale-105 transition-[transform]" src="/static/img/colinas-2.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                    </div>
+                    <div class="basis-64 grow-0 shrink-0 w-64 h-full" data-slider-thumb="2">
+                        <img class="w-full h-full object-cover object-center rounded cursor-pointer hover:scale-105 transition-[transform]" src="/static/img/colinas-3.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                    </div>
+                    <div class="basis-64 grow-0 shrink-0 w-64 h-full" data-slider-thumb="3">
+                        <img class="w-full h-full object-cover object-center rounded cursor-pointer hover:scale-105 transition-[transform]" src="/static/img/colinas-4.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                    </div>
+                    <div class="basis-64 grow-0 shrink-0 w-64 h-full" data-slider-thumb="4">
+                        <img class="w-full h-full object-cover object-center rounded cursor-pointer hover:scale-105 transition-[transform]" src="/static/img/colinas-5.jpg" alt="Fotografía del desarrollo y terrenos en Colinas del Mar">
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
