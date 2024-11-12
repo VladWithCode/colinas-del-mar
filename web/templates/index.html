@@ -234,16 +234,29 @@
                 class="relative object-center object-cover w-full h-full max-h-full z-0">
             </video>
             <figcaption
-                class="absolute top-1/2 -translate-y-1/2 left-0 right-0 z-20 text-stone-50 space-y-8" 
+                class="absolute w-full max-w-screen-xl mx-auto px-8 top-1/2 -translate-y-1/2 left-0 right-0 z-20 text-stone-50 space-y-3" 
                 style="text-shadow: 0px 5px 10px rgb(0,0,0,.8)">
-                <h1 class="w-fit text-3xl font-semibold uppercase mx-auto md:text-5xl md:text-center lg:text-6xl invisible" style="font-family: 'Crimson Text', serif;" id="main-heading">Lotes en<br class=""> Mazatlán</h1>
-                <div class="space-y-2 md:space-y-4 text-center" id="video-caption">
+                <h1
+                    class="w-fit text-3xl font-semibold uppercase md:text-5xl lg:text-6xl invisible"
+                    style="font-family: 'Crimson Text', serif;"
+                    id="main-heading">¡APROVECHA!
+                    <br class="">Lotes en Mazatlán
+                </h1>
+                <p class="text-lg md:text-xl font-medium pb-4">Financiamiento unico, hasta 48 meses.</p>
+                <div class="space-y-2 md:space-y-4 text-center pt-4 hidden" id="video-caption">
                     <svg class="block mx-auto h-12 w-12 fill-current lg:h-10 lg:w-10" style="filter: drop-shadow(0px 5px 10px rgb(0,0,0,.8))">
                         <use href="/static/svg/play.svg#play"></use>
                     </svg>
                     <span class="block text-xs font-medium uppercase">Reproducir Video</span>
                 </div>
             </figcaption>
+            <div class="absolute w-full max-w-screen-xl mx-auto px-8 left-0 right-0 bottom-1/4 z-40">
+                <a
+                    href="#formulario-contacto"
+                    class="block w-fit text-stone-50 font-semibold bg-stone-900 rounded shadow-lg shadow-stone-900 px-6 py-3 uppercase transition duration-150 hover:bg-stone-700 active:bg-stone-700 active:scale-95">
+                    Aparta con $3,500MXN
+                </a>
+            </div>
             <button 
                 type="button"
                 id="video-play-btn"
@@ -253,20 +266,24 @@
             <div class="absolute w-full h-full bg-stone-800 bg-opacity-60 z-10"></div>
             <img class="relative h-full w-full max-h-full object-center object-cover z-0" src="/static/img/gly-5.png" alt="Residencial slider imagen 1">
             <figcaption class="absolute flex flex-col top-1/2 -translate-y-1/2 text-stone-50 left-0 right-0 space-y-4 z-20 lg:space-y-6">
-                <h1 class="text-3xl font-semibold uppercase w-fit mx-auto md:text-5xl md:text-center lg:text-6xl" style="font-family: 'Crimson Text', serif;">Lotes<br> en Mazatlán</h1>
-                <p class="max-w-[30ch] mx-auto lg:text-lg">
-                Lotes desde 96m<sup>2</sup> hasta 280m<sup>2</sup> en una de las zonas más exclusivas
-                de la ciudad de Mazatlán.
+                <h1
+                    class="text-3xl font-semibold uppercase w-fit mx-auto md:text-5xl md:text-center lg:text-6xl"
+                    style="font-family: 'Crimson Text', serif;">
+                    ¡APROVECHA!
+                    <br>Lotes en Mazatlán
+                </h1>
+                <p class="max-w-[40ch] mx-auto lg:text-lg">
+                Lotes desde 96m<sup>2</sup> hasta 280m<sup>2</sup> en una prometedora zona de la ciudad de Mazatlán.
                 </p>
                 <a href="#formulario-cita" class="inline-block mx-auto bg-indigo-700 text-stone-50 rounded px-6 py-3">Solicitar cotización</a>
             </figcaption>
         </figure>
     </div>
-    <div class="absolute bottom-0 left-0 right-0 z-40">
+    <button id="scroll-down-btn" class="absolute bottom-0 left-0 right-0 z-40">
         <svg class="w-8 h-8 mx-auto mb-1.5 stroke-stone-50 rotate-90" id="scroll-arrow">
             <use href="/static/svg/arrow.svg#arrow"></use>
         </svg>
-    </div>
+    </button>
 </div>
 
 <section
