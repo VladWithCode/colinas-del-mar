@@ -7,3 +7,7 @@ cmd/*
 
 # Ignore .env files
 *.env
+
+# Ignore tailwind node_modules
+# f v4
+node_modules
