@@ -175,10 +175,14 @@
         let distanceTagStone = document.createElement("div")
         distanceTagStone.className = tagClassName;
         distanceTagStone.textContent = "20 min de la isla de la piedra"
+        let colinasTag = document.createElement("div")
+        colinasTag.className = tagClassName;
+        colinasTag.textContent = "Colinas del Mar"
 
         let landMarker = new AdvancedMarkerElement({
             map,
             position: {lat: 23.184855, lng: -106.332463},
+            content: colinasTag,
         })
         let stoneMarker = new AdvancedMarkerElement({
             map,
@@ -275,7 +279,7 @@
                 <p class="max-w-[40ch] mx-auto lg:text-lg">
                 Lotes desde 96m<sup>2</sup> hasta 280m<sup>2</sup> en una prometedora zona de la ciudad de Mazatlán.
                 </p>
-                <a href="#formulario-cita" class="inline-block mx-auto bg-indigo-700 text-stone-50 rounded px-6 py-3">Solicitar cotización</a>
+                <a href="#formulario-contacto" class="inline-block mx-auto bg-indigo-700 text-stone-50 rounded px-6 py-3">Solicitar cotización</a>
             </figcaption>
         </figure>
     </div>
@@ -386,7 +390,7 @@
 	</p>
 	<div class="w-3/4 mx-auto max-w-96">
 		<a
-			href="#formulario-cita"
+			href="#formulario-contacto"
 			class="block mx-auto bg-stone-50 text-blue-700 text-center rounded px-6 py-3"
 			>Solicitar cotización</a
 		>
@@ -472,7 +476,7 @@
                         <use href="/static/svg/envelope.svg#envelope"></use>
                     </svg>
                 </div>
-                <p class="">colinas@sibradgo.com.mx</p>
+                <p class="">contacto@colinasdelmar.mx</p>
             </div>
             <div class="flex items-center gap-6 pl-6 pr-4">
                 <div class="">
@@ -534,7 +538,7 @@
                         <use href="/static/svg/envelope.svg#envelope"></use>
                     </svg>
                 </div>
-                <p class="">colinas@sibradgo.com.mx</p>
+                <p class="">colinas@colinasdelmar.mx</p>
             </div>
             <div class="flex items-center gap-6 pl-6 pr-4">
                 <div class="">
