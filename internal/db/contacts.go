@@ -16,6 +16,7 @@ type Contact struct {
 	AssignedTo string    `json:"assignedTo" db:"assign_to"`
 	LotNum     string    `json:"lotNum" db:"lot_num"`
 	Mz         string    `json:"mz" db:"mz"`
+	CampaingId string    `json:"campaingId" db:"campaign_id"`
 }
 
 func CreateContact(contact *Contact) error {
@@ -31,13 +32,17 @@ func CreateContact(contact *Contact) error {
 	id, _ := uuid.NewV7()
 	_, err = conn.Exec(
 		ctx,
-		"INSERT INTO contacts (id, name, phone, pending, created_at) VALUES $1, $2, $3, $4, $5",
+		"INSERT INTO contacts (id, name, phone, pending, created_at, campaing_id) VALUES $1, $2, $3, $4, $5, $6",
 		id,
 		contact.Name,
 		contact.Phone,
 		contact.Pending,
 		contact.CreatedAt,
+		contact.CampaingId,
 	)
+	if err != nil {
+		return err
+	}
 
 	contact.Id = id.String()
 	return nil
