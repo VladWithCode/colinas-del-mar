@@ -11,7 +11,7 @@ import (
 	"github.com/vladwithcode/colinas/internal/db"
 )
 
-type TemplateVar map[string]interface{}
+type TemplateVar map[string]any
 
 type TemplateComponent struct {
 	ComponentType string        `json:"type"`
@@ -32,7 +32,11 @@ type templatePayload struct {
 	} `json:"language"`
 }
 
-func postCloudAPIMessage(requestPayload interface{}) error {
+var (
+	ErrPhoneNotSet = errors.New("phone number is not set")
+)
+
+func postCloudAPIMessage(requestPayload any) error {
 	phoneNumberId := os.Getenv("FB_PHONE_NUMBER_ID")
 	fbAccessToken := os.Getenv("FB_ACCESS_TOKEN")
 
@@ -49,8 +53,11 @@ func postCloudAPIMessage(requestPayload interface{}) error {
 		return err
 	}
 
-	reqUrl := fmt.Sprintf("https://graph.facebook.com/v20.0/%v/messages", phoneNumberId)
+	reqUrl := fmt.Sprintf("https://graph.facebook.com/v22.0/%v/messages", phoneNumberId)
 	req, err := http.NewRequest("post", reqUrl, bytes.NewReader(reqBody))
+	if err != nil {
+		return err
+	}
 
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", fbAccessToken))
@@ -65,7 +72,7 @@ func postCloudAPIMessage(requestPayload interface{}) error {
 		fmt.Printf("Errored with status: %v\n", resp.Status)
 		fmt.Printf("resp.Header: %v\n", resp.Header["Www-Authenticate"])
 
-		return errors.New(fmt.Sprintf("Request failed with code: %v", resp.StatusCode))
+		return fmt.Errorf("request failed with code: %v", resp.StatusCode)
 	}
 
 	return nil
@@ -113,7 +120,7 @@ func SendNewContactNotification(contactData *db.Contact) error {
 	sendToPhone := os.Getenv("CONTACT_PHONE")
 
 	if sendToPhone == "" {
-		return errors.New("SendTo phone is not in ENV")
+		return ErrPhoneNotSet
 	}
 
 	var (
@@ -137,6 +144,42 @@ func SendNewContactNotification(contactData *db.Contact) error {
 
 	return SendTemplateMessage(sendToPhone, TemplateData{
 		TemplateName: "info_request",
+		BodyVars:     bodyVars,
+		HeaderVars:   headerVars,
+	})
+}
+
+func SendNewCampaignNotification(contactData *db.Contact) error {
+	sendToPhone := os.Getenv("CAMPAIGN_PHONE")
+
+	if sendToPhone == "" {
+		return ErrPhoneNotSet
+	}
+
+	var (
+		headerVars []TemplateVar
+		bodyVars   []TemplateVar
+	)
+
+	createdDateStr := contactData.CreatedAt.Format("2006-01-02 03:04pm")
+	bodyVars = append(bodyVars, TemplateVar{
+		"type":           "text",
+		"parameter_name": "name",
+		"text":           contactData.Name,
+	})
+	bodyVars = append(bodyVars, TemplateVar{
+		"type":           "text",
+		"parameter_name": "date",
+		"text":           createdDateStr,
+	})
+	bodyVars = append(bodyVars, TemplateVar{
+		"type":           "text",
+		"parameter_name": "phone",
+		"text":           contactData.Phone,
+	})
+
+	return SendTemplateMessage(sendToPhone, TemplateData{
+		TemplateName: "campaing_request",
 		BodyVars:     bodyVars,
 		HeaderVars:   headerVars,
 	})
