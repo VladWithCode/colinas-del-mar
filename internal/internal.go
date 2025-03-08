@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"errors"
 	"fmt"
 	"math/big"
 	"regexp"
@@ -18,7 +17,7 @@ func FormatPhone(p string) (string, error) {
 	phone = replaceExp.ReplaceAll([]byte(phone), []byte(""))
 
 	if !numExp.Match(phone) {
-		return "", errors.New(fmt.Sprintf("The string is not a valid phone number: %v", p))
+		return "", fmt.Errorf("the string is not a valid phone number: %v", p)
 	}
 
 	return string(phone), nil
