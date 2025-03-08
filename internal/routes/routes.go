@@ -12,6 +12,7 @@ func NewRouter() http.Handler {
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /{$}", RenderIndex)
+	router.HandleFunc("GET /campana-fb", RenderCampana)
 
 	fs := http.FileServer(http.Dir("web/static/"))
 	router.Handle("GET /static/", http.StripPrefix("/static/", fs))
@@ -73,6 +74,31 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		RespondWithError(w, 500, ErrorParams{})
+	}
+}
+
+func RenderCampana(w http.ResponseWriter, r *http.Request) {
+	templ, err := template.ParseFiles(
+		"web/templates/campana/campana.html",
+		"web/templates/campana/campana_header.html",
+		"web/templates/campana/campana_contact.html",
+		"web/templates/campana/campana_footer.html",
+	)
+
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		w.WriteHeader(500)
+		w.Write([]byte("Ocurrio un error inesperado en el servidor."))
+		return
+	}
+
+	err = templ.Execute(w, nil)
+
+	if err != nil {
+		fmt.Printf("err: %v\n", err)
+		w.WriteHeader(500)
+		w.Write([]byte("Ocurrio un error inesperado en el servidor."))
+		return
 	}
 }
 

@@ -1,0 +1,55 @@
+{{define "contact"}}
+<section class="py-12">
+    <h1 class="text-3xl font-bold px-4 mb-4">¡Aparta ya!</h1>
+    <p class="px-4 mb-2">Contactanos para quedarte con el lote que mas te guste aquí en Colinas Del Mar.</p>
+
+    {{template "contact-form" .}}
+</section>
+{{end}}
+
+{{define "contact-form"}}
+{{$validStyles := "text-stone-800 font-medium border-stone-400"}}
+{{$invalidStyles := "text-red-500 font-bold border-red-500"}}
+<form hx-post="/api/contact/campana" class="p-4 space-y-6">
+    <div class="flex flex-col gap-2">
+        <label for="name" class="font-bold uppercase">Nombre</label>
+        <input 
+        id="contact-name"
+        name="name"
+        type="text"
+        maxlength="50"
+        placeholder="Jose Perez"
+        class="bg-stone-100 px-4 py-2 rounded border {{with .NameInvalid}}{{$invalidStyles}}{{else}}{{$validStyles}}{{end}}" 
+        {{with .NameValue}}value="{{.}}"{{end}}
+        required />
+    </div>
+    <div class="flex flex-col gap-2">
+        <label for="phone" class="font-bold uppercase">Teléfono</label>
+        <input 
+        id="contact-phone" 
+        name="phone"
+        type="tel"
+        maxlength="10"
+        placeholder="669-458-8259"
+        class="bg-stone-100 px-4 py-2 rounded border {{with .PhoneInvalid}}{{$invalidStyles}}{{else}}{{$validStyles}}{{end}}"
+        {{with .PhoneValue}}value="{{.}}"{{end}}
+        required />
+    </div>
+    {{template "request-feedback" .}}
+    <button class="w-full py-2 bg-main text-lg text-stone-50 font-black rounded mt-4">Enviar</button>
+</form>
+{{end}}
+
+{{define "request-feedback"}}
+    {{with .IsInvalid}}
+    <div class="py-2 text-red-500 font-bold text-lg space-y-2">
+        {{range $.Errors}}
+        <p class="">{{.}}</p>
+        {{end}}
+    </div>
+    {{else with .IsSuccess}}
+    <p class="py-2 text-emerald-500 font-bold text-lg">Gracias por tu contacto. Te responderemos lo antes posible.</p>
+    {{else}}
+    <div class="p-0 h-0"></div>
+    {{end}}
+{{end}}

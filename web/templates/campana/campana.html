@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotes en Oferta | Colinas del Mar</title>
+    <link rel="favicon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/js/htmx.js"></script>
+    <script src="/static/js/gsap.js"></script>
+    <script src="/static/js/gsap-observer-plugin.js"></script>
+</head>
+<body>
+    {{template "header" .}}
+
+    <section class="relative z-0 min-h-[72vh] overflow-hidden">
+        <video
+            src="/static/video/main_header_hd.mp4"
+            autoplay
+            muted
+            loop
+            class="relative top-0 left-0 -z-10 bg-stone-900">
+        </video>
+        <div class="absolute inset-0 z-10">
+            <span class="absolute block inline-0 h-full w-full bg-stone-800/30  -z-10"></span>
+            <!-- <p class="text-xl text-stone-100 px-4 max-w-[35ch] leading-relaxed pt-[36%]">
+            Aprovecha esta oferta y adquiere tu lote. Contamos con financiamiento con <strong class="font-bold">crédito Infonavit</strong>.
+            </p>
+            <div class="flex px-4 w-full py-12">
+                <a href="#cta-form" class="bg-main text-stone-50 font-black rounded px-8 py-3 ml-auto scale-100 transition-transform duration-100 hover:bg-main-dark active:bg-main-dark active:scale-95">
+                    Cotizar ahora
+                </a>
+            </div> -->
+        </div>
+    </section>
+    <!-- <h1 class="text-4xl font-bold text-stone-50 tracking-wide px-4  mb-6 uppercase">Adquiere tu terreno</h1> -->
+
+    <section class="relative bg-stone-800 text-stone-50 z-0 py-12">
+        <div class="px-4 pb-10 space-y-3">
+            <h1 class="text-3xl text-center">Paga mensualmente</h1>
+            <p class="text-4xl text-center font-bold p-4 border-2 border-current rounded-2xl">$3,640.00MXN</p>
+        </div>
+        <div class="px-4 py-6 space-y-8 mb-4">
+            <p class="flex gap-2.5 justify-center items-center">
+                <span class="basis-1/2 grow shrink text-6xl font-black text-end tracking-wide">48<strong class="text-main-dark">M</strong></span>
+                <span class="w-1.5 h-14 bg-white"></span>
+                <span class="basis-1/2 shrink grow text-lg">Con enganche de $30,000.00 mxn</span>
+            </p>
+            <p class="flex gap-2.5 justify-center items-center">
+                <span class="basis-1/2 grow shrink">Aprovecha también aquí tu Crédito Infonavit</span>
+                <span class="w-1.5 h-14 bg-white"></span>
+                <span class="basis-1/2 shrink grow text-lg">
+                    <img src="/static/img/infonavit.png" alt="Crédito infonavit" class="w-8/10 max-w-60 mx-auto">
+                </span>
+            </p>
+            <p class="flex gap-2.5 justify-center items-center">
+                <span class="basis-1/2 grow shrink text-6xl font-black text-end tracking-wide">
+                    <img src="/static/img/descuento.webp" alt="Descuento" class="w-8/10 max-w-60 mx-auto">
+                </span>
+                <span class="w-1.5 h-14 bg-white"></span>
+                <span class="basis-1/2 shrink grow text-lg">Pagos cómodos y un patrimonio asegurado.</span>
+            </p>
+        </div>
+        <p class="px-4 mb-2">Aprovecha esta oferta única para adquirir tu lote en colinas del mar.</p>
+        <p class="px-4">Contamos con financiamiento con Crédito Infonavit, ofreciendote una mayor facilidad de pago.</p>
+    </section>
+
+    {{template "contact" .}}
+
+    <section class="bg-secondary text-stone-50 z-0 py-12">
+        <h1 class="text-3xl font-bold px-4 mb-4">Cotiza tu lote</h1>
+        <p class="px-4 mb-2">Selecciona el numero de pagos para saber la mensualidad que pagarás.</p>
+    </section>
+
+    {{template "footer" .}}
+</body>
+</html>
