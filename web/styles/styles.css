@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 
-@config './tailwind.config.js';
+@theme {
+    --color-main: #daa520;
+    --color-main-dark: #b8860b;
+    --color-secondary: #1b1b1b;
+    --color-accent: #ffd700;
+}
 
 html,
 body {
