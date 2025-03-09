@@ -1,16 +1,63 @@
 {{define "contact"}}
-<section class="py-12">
+{{$validStyles := "px-4 py-2 rounded border bg-stone-100 text-stone-800 font-medium border-stone-400"}}
+{{$invalidStyles := "px-4 py-2 rounded border bg-red-200/30 text-red-500 font-bold border-red-500"}}
+<section id="campana-contact" class="py-12">
     <h1 class="text-3xl font-bold px-4 mb-4">¡Aparta ya!</h1>
     <p class="px-4 mb-2">Contactanos para quedarte con el lote que mas te guste aquí en Colinas Del Mar.</p>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            let sectionElem = document.getElementById("campana-contact")
+            let contactForm = document.getElementById("campana-contact-form")
+            let loader = document.getElementById("campana-loader")
+            let inputs = contactForm.querySelectorAll("input")
+
+            sectionElem.addEventListener("submit", (e) => {
+                const tl = gsap.timeline({ duration: 0.15, ease: "power2.inOut" })
+                tl.to(loader, { autoAlpha: 1 })
+            })
+
+            sectionElem.addEventListener("input", (e) => {
+                const inp = e.target
+
+                inp.setAttribute("class", "{{$validStyles}}")
+
+                let feedback = document.getElementById("contact-feedback")
+                if (feedback) {
+                    feedback.innerHTML = ""
+                }
+            })
+
+            document.addEventListener("htmx:beforeSwap", (e) => {
+                let forceSwap = e.detail.xhr.getResponseHeader("X-ForceSwap")
+                if (forceSwap) {
+                    e.detail.shouldSwap = "outerHTML"
+                }
+
+                const tl = gsap.timeline({ duration: 0.15, ease: "power2.inOut" })
+                tl.to(loader, { autoAlpha: 0 })
+            })
+        })
+    </script>
     {{template "contact-form" .}}
 </section>
 {{end}}
 
 {{define "contact-form"}}
-{{$validStyles := "text-stone-800 font-medium border-stone-400"}}
-{{$invalidStyles := "text-red-500 font-bold border-red-500"}}
-<form hx-post="/api/contact/campana" class="p-4 space-y-6">
+{{$validStyles := "px-4 py-2 rounded border bg-stone-100 text-stone-800 font-medium border-stone-400"}}
+{{$invalidStyles := "px-4 py-2 rounded border bg-red-200/30 text-red-500 font-bold border-red-500"}}
+<form
+    id="campana-contact-form"
+    hx-post="/api/contact/campana"
+    hx-swap="outerHTML"
+    hx-target="#campana-contact-form"
+    class="relative p-4 space-y-6">
+    <div id="campana-loader" class="flex flex-col absolute inset-0 z-10 bg-stone-500/70 text-stone-50 backdrop-blur-xs m-0 invisible">
+        <svg class="size-12 fill-current m-auto mb-2 animate-spin" viewBox="0 0 24 24">
+            <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+        </svg>
+        <p class="text-xl font-bold uppercase text-center m-auto mt-2">Enviando...</p>
+    </div>
     <div class="flex flex-col gap-2">
         <label for="name" class="font-bold uppercase">Nombre</label>
         <input 
@@ -19,7 +66,7 @@
         type="text"
         maxlength="50"
         placeholder="Jose Perez"
-        class="bg-stone-100 px-4 py-2 rounded border {{with .NameInvalid}}{{$invalidStyles}}{{else}}{{$validStyles}}{{end}}" 
+        class="{{with .NameInvalid}}{{$invalidStyles}}{{else}}{{$validStyles}}{{end}}" 
         {{with .NameValue}}value="{{.}}"{{end}}
         required />
     </div>
@@ -29,27 +76,36 @@
         id="contact-phone" 
         name="phone"
         type="tel"
-        maxlength="10"
+        maxlength="13"
         placeholder="669-458-8259"
-        class="bg-stone-100 px-4 py-2 rounded border {{with .PhoneInvalid}}{{$invalidStyles}}{{else}}{{$validStyles}}{{end}}"
+        class="{{with .PhoneInvalid}}{{$invalidStyles}}{{else}}{{$validStyles}}{{end}}"
         {{with .PhoneValue}}value="{{.}}"{{end}}
         required />
     </div>
+    <div class="flex gap-4">
+        <input 
+            type="checkbox"
+            name="consent"
+            id="contact-consent"
+            {{with .ConsentChecked}}checked{{end}}
+            required >
+        <label for="contact-consent" class="text-sm">Acepto que se me contacte a través de Whatsapp o llamada teléfonica</label>
+    </div>
     {{template "request-feedback" .}}
-    <button class="w-full py-2 bg-main text-lg text-stone-50 font-black rounded mt-4">Enviar</button>
+    <button class="w-full py-2 bg-main text-lg text-stone-50 font-black rounded mt-4 cursor-pointer transition-transform duration-200 hover:bg-main-dark active:bg-main-dark active:scale-95">Enviar</button>
 </form>
 {{end}}
 
 {{define "request-feedback"}}
     {{with .IsInvalid}}
-    <div class="py-2 text-red-500 font-bold text-lg space-y-2">
+    <div id="contact-feedback" class="text-red-500 font-bold text-lg space-y-2">
         {{range $.Errors}}
         <p class="">{{.}}</p>
         {{end}}
     </div>
     {{else with .IsSuccess}}
-    <p class="py-2 text-emerald-500 font-bold text-lg">Gracias por tu contacto. Te responderemos lo antes posible.</p>
+    <p id="contact-feedback" class="text-emerald-500 font-bold text-lg">Gracias por tu contacto. Te responderemos lo antes posible.</p>
     {{else}}
-    <div class="p-0 h-0"></div>
+    <div id="contact-feedback" class="p-0 h-0"></div>
     {{end}}
 {{end}}
