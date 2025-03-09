@@ -32,7 +32,7 @@ func CreateContact(contact *Contact) error {
 	id, _ := uuid.NewV7()
 	_, err = conn.Exec(
 		ctx,
-		"INSERT INTO contacts (id, name, phone, pending, created_at, campaing_id) VALUES $1, $2, $3, $4, $5, $6",
+		"INSERT INTO contacts (id, name, phone, pending, created_at, campaing_id) VALUES ($1, $2, $3, $4, $5, $6)",
 		id,
 		contact.Name,
 		contact.Phone,
