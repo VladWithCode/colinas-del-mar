@@ -179,7 +179,7 @@ func SendNewCampaignNotification(contactData *db.Contact) error {
 	})
 
 	return SendTemplateMessage(sendToPhone, TemplateData{
-		TemplateName: "campaing_request",
+		TemplateName: "campaign_request",
 		BodyVars:     bodyVars,
 		HeaderVars:   headerVars,
 	})
