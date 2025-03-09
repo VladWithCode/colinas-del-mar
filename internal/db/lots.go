@@ -51,6 +51,10 @@ func GetLots() ([]*Lot, error) {
 			&lot.Available,
 		)
 
+		if err != nil {
+			return nil, err
+		}
+
 		lots = append(lots, &lot)
 	}
 
@@ -114,6 +118,10 @@ func CreateLot(lot *Lot) error {
 		lot.Type,
 		lot.PriceCash,
 	)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
