@@ -74,6 +74,8 @@ class InfiniteSlider {
       this.sliderElem.style.transform = `translateX(133.33%)`;
       this.sliderElem.prepend(this.slidesElems[this.totalSlides - 2].cloneNode(true));
       this.sliderElem.append(this.slidesElems[1].cloneNode(true));
+    } else {
+        this.sliderElem.style.transform = "translateX(-100%)"
     }
     this.animate = this.animate.bind(this);
     this.prev = this.prev.bind(this);
