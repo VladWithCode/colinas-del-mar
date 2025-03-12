@@ -14,6 +14,7 @@
     <script src="/static/js/htmx.js"></script>
     <script src="/static/js/gsap.js"></script>
     <script src="/static/js/gsap-observer-plugin.js"></script>
+    <script src="/static/js/InfiniteSlider.js" type="module" defer></script>
 </head>
 <body>
     {{template "header" .}}
@@ -72,9 +73,14 @@
 
     {{template "contact" .}}
 
-    <section class="bg-secondary text-stone-50 z-0 py-12">
-        <h1 class="text-3xl font-bold px-4 mb-4">Cotiza tu lote</h1>
-        <p class="px-4 mb-2">Selecciona el numero de pagos para saber la mensualidad que pagarás.</p>
+    <section 
+        id="quote-section"
+        class="flex flex-col h-screen min-h-max bg-secondary text-stone-50 z-0 py-12 max-w-screen">
+        <h1 class="flex-auto shrink grow-0 text-3xl font-bold px-4 mb-4">Cotiza tu lote</h1>
+        <p class="flex-auto shrink grow-0 px-4 mb-4">Selecciona el número de pagos para saber la mensualidad que pagarás.</p>
+        {{template "feature-slider" .}}
+
+
     </section>
 
     {{template "footer" .}}

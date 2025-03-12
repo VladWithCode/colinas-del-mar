@@ -82,6 +82,7 @@ func RenderCampana(w http.ResponseWriter, r *http.Request) {
 		"web/templates/campana/campana.html",
 		"web/templates/campana/campana_header.html",
 		"web/templates/campana/campana_contact.html",
+		"web/templates/campana/campana_feature_slider.html",
 		"web/templates/campana/campana_footer.html",
 	)
 
