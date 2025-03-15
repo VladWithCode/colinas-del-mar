@@ -1,6 +1,43 @@
 {{define "header"}}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const navToggler = document.getElementById("nav-toggler")
+        navToggler.addEventListener("click", e => {
+            e.preventDefault()
+            const navMenu = document.getElementById("nav-menu")
+            if (navMenu.dataset.navMenu === "open") {
+                navMenu.dataset.navMenu = "closed"
+                navMenu.style.height = "0px"
+                navMenu.style.opacity = "0"
+            } else {
+                navMenu.dataset.navMenu = "open"
+                navMenu.style.height = "auto"
+                navMenu.style.opacity = "1"
+            }
+        })
+
+        const header = document.getElementById("header")
+        const logoWrapper = document.getElementById("header-logo-wrapper")
+        const observer = new IntersectionObserver((entries, observer) => {
+            let tl = gsap.timeline({ duration: 0.3, ease: "power3.out" })
+            let target = entries[0]
+            if (!target.isIntersecting) {
+                tl.set(header, { y: "-100%", background: "rgb(0 0 0 / 45%)", backdropFilter: "blur(4px)" })
+                tl.to(header, { position: "fixed", y: "0%" })
+                tl.to(logoWrapper, { autoAlpha: 1, y: "0%" }, "<")
+            } else {
+                tl.to(logoWrapper, { autoAlpha: 0, y: "-100%" })
+                tl.to(header, { background: "rgb(0 0 0 / 0%)", backdropFilter: "blur(0px)" }, "<0.2")
+                tl.set(header, { position: "", background: "", y: "" })
+
+            }
+        }, { threshold: 0.60 });
+
+        observer.observe(document.querySelector("[data-header-threshold]"))
+    })
+</script>
 <header
-    class="absolute top-0 left-0 right-0 flex items-center h-20 bg-stone-50/0 text-stone-50 z-50 overflow-x-hidden shadow-none w-screen gap-8 px-4"
+    class="absolute top-0 left-0 right-0 flex items-center h-20 transparent text-stone-50 z-50 overflow-x-hidden shadow-none w-screen gap-8 px-4"
     data-nav-wrapper="closed"
     id="header">
     <div
@@ -12,7 +49,7 @@
         <span class="bg-current rounded-full h-[5px] w-full"></span>
     </div>
 
-    <div class="max-w-3/5 flex-1 h-full overflow-hidden ml-auto hidden">
+    <div id="header-logo-wrapper" class="w-3/5 flex-1 h-full overflow-hidden ml-auto opacity-0 invisible">
         <img
             class="h-full max-w-full object-center object-contain" 
             src="/static/img/colinas_logo.png"
