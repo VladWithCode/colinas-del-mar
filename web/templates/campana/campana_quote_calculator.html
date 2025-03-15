@@ -1,0 +1,79 @@
+{{define "quote-calculator"}}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const threshold = document.getElementById("quote-threshold");
+        const observer = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(async (entry) => {
+                if (entry.isIntersecting) {
+                    await import("/static/js/quote-calculator.js");
+                }
+            });
+        }, { threshold: 1 });
+
+        observer.observe(threshold);
+    })
+</script>
+<div class="relative basis-auto grow shrink-0 px-4 group" id="quote-calculator">
+    <div id="quote-threshold" class="absolute -top-180 left-0 h-px w-full"></div>
+    <div class="text-stone-50">
+        <div id="deposit-selector" class="flex items-center justify-center aspect-[2/1] mb-6">
+            <div class="basis-1/2 grow shrink text-center scale-80 brightness-75 has-checked:scale-100 has-checked:brightness-100 transition duration-200">
+                <input 
+                    type="radio"
+                    id="with-deposit"
+                    name="deposit"
+                    value="with-deposit"
+                    class="size-0"
+                    data-radio-deposit
+                    checked>
+                <label 
+                    for="with-deposit"
+                    class="flex flex-col gap-2.5 text-sm font-bold uppercase">
+                    <span class="text-xl font-bold">$230,000.00<span class="text-xs font-semibold">MXN</span></span>
+                    <span class="text-xs uppercase">Con Enganche de:</span>
+                    <span class="text-xl font-bold">$30,000.00<span class="text-xs font-semibold">MXN</span></span>
+                </label>
+            </div>
+            <div class="w-0.5 h-full bg-white mx-2"></div>
+            <div class="basis-1/2 grow shrink text-center scale-80 brightness-75 has-checked:scale-100 has-checked:brightness-100 transition duration-200">
+                <input
+                    type="radio"
+                    id="no-deposit"
+                    name="deposit"
+                    value="no-deposit"
+                    class="size-0"
+                    data-radio-deposit>
+                <label
+                    for="no-deposit"
+                    class="flex flex-col gap-2.5 text-sm font-bold uppercase">
+                    <span class="text-xl font-bold">$245,000.00<span class="text-xs font-semibold">MXN</span></span>
+                    <span class="text-xs uppercase">Sin Enganche</span>
+                </label>
+            </div>
+        </div>
+        <div class="flex items-center mb-4 peer:has-cheked">
+            <div class="basis-3/5 grow shrink">
+                <input type="range" class="w-full" id="quote-no-payments-range" name="no-payments" min="20" max="48" value="44">
+            </div>
+            <div class="basis-auto grow shrink space-y-0.5 text-center">
+                <p id="quote-no-payments-value" class="text-4xl font-black tracking-wide text-stone-50">44</p>
+                <p class="text-sm text-stone-50 font-bold uppercase">Pago(s)</p>
+            </div>
+        </div>
+        <p class="flex flex-col m-auto text-center px-4 py-2">
+            <span class="text-sm font-bold uppercase">Pagas:</span>
+            <span class="text-4xl"><span id="quote-monthly" class="tracking-wide">$3,640.00</span> MXN al mes</span>
+        </p>
+        <p class="text-7xl font-black text-center">&plus;</p>
+        <div class="flex flex-wrap gap-4 items-center justify-center">
+            <p class="flex flex-col items-center justify-center gap-1">
+                <span class="text-3xl font-black">10</span>
+                <span class="text-sm font-bold uppercase">Pagos</span>
+            </p>
+            <p class="text-sm uppercase">De</p>
+            <p id="quote-december" class="text-3xl font-black">$10,000.00</p>
+            <p class="text-sm font semibold w-full shrink-0 grow-0 max-w-[36ch]">En los meses de diciembre 2025, 2026, 2027 y el ultimo pago.</p>
+        </div>
+    </div>
+</div>
+{{end}}
