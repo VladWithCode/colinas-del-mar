@@ -2,34 +2,47 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const navToggler = document.getElementById("nav-toggler")
+        const navMenu = document.getElementById("nav-menu")
+        const header = document.getElementById("header")
+        const logoWrapper = document.getElementById("header-logo-wrapper")
+
+        let navMenuHeight = navMenu.scrollHeight
         navToggler.addEventListener("click", e => {
             e.preventDefault()
-            const navMenu = document.getElementById("nav-menu")
+            const toggleTl = gsap.timeline({ duration: 0.3, ease: "power3.out" })
+            console.log(header.dataset.headerSticking)
             if (navMenu.dataset.navMenu === "open") {
                 navMenu.dataset.navMenu = "closed"
-                navMenu.style.height = "0px"
-                navMenu.style.opacity = "0"
+                if (!header.dataset.headerSticking) {
+                    toggleTl.to(header, { backgroundColor: "rgba(41, 37, 36, 0%)", backdropFilter: "blur(0px)" })
+                }
+                toggleTl.to(navMenu, { height: "0px", opacity: "0" }, "<0.2")
             } else {
                 navMenu.dataset.navMenu = "open"
-                navMenu.style.height = "auto"
-                navMenu.style.opacity = "1"
+                if (!header.dataset.headerSticking) {
+                    toggleTl.to(header, { backgroundColor: "rgba(41, 37, 36, 50%)", backdropFilter: "blur(8px)" })
+                }
+                toggleTl.to(navMenu, { height: navMenuHeight + "px", opacity: "1" }, "<0.2")
             }
         })
 
-        const header = document.getElementById("header")
-        const logoWrapper = document.getElementById("header-logo-wrapper")
         const observer = new IntersectionObserver((entries, observer) => {
             let tl = gsap.timeline({ duration: 0.3, ease: "power3.out" })
             let target = entries[0]
-            if (!target.isIntersecting) {
-                tl.set(header, { y: "-100%", background: "rgb(0 0 0 / 45%)", backdropFilter: "blur(4px)" })
+            if (target.isIntersecting) {
+                tl.to(logoWrapper, { autoAlpha: 0, y: "-100%" })
+                if (navMenu.dataset.navMenu !== "open") {
+                    tl.to(header, { backgroundColor: "rgba(41, 37, 36, 0%)", backdropFilter: "blur(0px)" }, "<0.2")
+                }
+                tl.set(header, { position: "", y: "" })
+
+                header.removeAttribute("data-header-sticking")
+            } else {
+                header.setAttribute("data-header-sticking", true)
+
+                tl.set(header, { y: "-100%", backgroundColor: "rgba(41, 37, 36, 50%)", backdropFilter: "blur(8px)" })
                 tl.to(header, { position: "fixed", y: "0%" })
                 tl.to(logoWrapper, { autoAlpha: 1, y: "0%" }, "<")
-            } else {
-                tl.to(logoWrapper, { autoAlpha: 0, y: "-100%" })
-                tl.to(header, { background: "rgb(0 0 0 / 0%)", backdropFilter: "blur(0px)" }, "<0.2")
-                tl.set(header, { position: "", background: "", y: "" })
-
             }
         }, { threshold: 0.60 });
 
@@ -37,8 +50,7 @@
     })
 </script>
 <header
-    class="absolute top-0 left-0 right-0 flex items-center h-20 transparent text-stone-50 z-50 overflow-x-hidden shadow-none w-screen gap-8 px-4"
-    data-nav-wrapper="closed"
+    class="absolute top-0 left-0 right-0 flex items-center h-20 bg-stone-800/0 text-stone-50 z-50 shadow-none w-screen gap-8 px-4"
     id="header">
     <div
         class="w-8 aspect-square flex flex-col justify-evenly items-end text-stone-50 2xl:hidden"
@@ -59,35 +71,29 @@
 
     <ul class="hidden col-start-1 row-start-1 lg:flex gap-4 justify-self-end mr-6 text-stone-50" id="nav-menu-desktop">
         <li class="font-semibold">
-            <a href="#seccion-ubicacion">Ubicacion</a>
+            <a href="#contact-form">Contacto</a>
         </li>
         <li class="font-semibold">
-            <a href="#formulario-contacto">Contacto</a>
+            <a href="#quote-calculator">Plano</a>
         </li>
         <li class="font-semibold">
-            <a href="#seccion-plano">Plano</a>
-        </li>
-        <li class="font-semibold">
-            <a href="/">Inicio</a>
+            <a href="https://sibradgo.com.mx" target="_blank">Sibra Durango</a>
         </li>
     </ul>
 
-    <div class="fixed top-20 left-0 right-0 bg-stone-50 z-0 h-0 opacity-0 overflow-hidden md:top-32" id="nav-menu" data-nav-menu="">
-        <ul class="text-stone-950 uppercase">
-            <li class="py-2 px-4 border-stone-400 border-b border-t">
-                <a href="/" class="">Inicio</a>
+    <div class="fixed top-20 left-0 right-0 bg-stone-800/50 backdrop-blur-sm z-30 h-0 opacity-0 overflow-hidden md:top-32" id="nav-menu" data-nav-menu="">
+        <ul class="text-stone-50 uppercase">
+            <li class="py-2 px-4 border-stone-400 border-b">
+                <a href="#infonavit" class="">Credito Infonavit</a>
             </li>
             <li class="py-2 px-4 border-stone-400 border-b">
-                <a href="#seccion-plano" class="">Plano</a>
+                <a href="#contact-form" class="">Contacto</a>
             </li>
             <li class="py-2 px-4 border-stone-400 border-b">
-                <a href="#formulario-contacto" class="">Contacto</a>
+                <a href="#quote-calculator" class="">Cotiza tu lote</a>
             </li>
-            <li class="py-2 px-4 border-stone-400 border-b">
-                <a href="#seccion-ubicacion" class="">Ubicacion</a>
-            </li>
-            <li class="py-2 px-4 text-indigo-900 font-semibold border-stone-400 border-b">
-                <a href="https://sibradgo.com.mx" class="">Sibra Durango</a>
+            <li class="py-2 px-4 text-indigo-500 font-bold border-stone-400 border-b">
+                <a href="https://sibradgo.com.mx" target="_blank" class="">Sibra Durango</a>
             </li>
         </ul>
     </div>
