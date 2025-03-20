@@ -1240,6 +1240,9 @@
   .border-stone-400 {
     border-color: var(--color-stone-400);
   }
+  .bg-blue-700 {
+    background-color: var(--color-blue-700);
+  }
   .bg-current {
     background-color: currentColor;
   }
@@ -1326,6 +1329,9 @@
   }
   .fill-stone-950 {
     fill: var(--color-stone-950);
+  }
+  .stroke-current {
+    stroke: currentColor;
   }
   .stroke-stone-50 {
     stroke: var(--color-stone-50);
