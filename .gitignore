@@ -6,7 +6,7 @@ cmd/*
 !cmd/**/*.go
 
 # Ignore .env files
-*.env
+*.env*
 
 # Ignore tailwind node_modules
 # f v4
