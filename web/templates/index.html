@@ -13,10 +13,6 @@
     border-radius: 999px;
 }
 
-.slider .slider-dot.active {
-    background-color: rgb(67, 56, 224);
-}
-
 .distance-tag::after {
     content:' ';
     position:absolute;
@@ -27,7 +23,7 @@
     height:0px;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
-    border-top: 18px solid rgb(49 46 129);
+    border-top: 18px solid #daa520;
 }
 </style>
 <script>
@@ -167,7 +163,7 @@
             zoom: 15,
             mapId: "EX_MAP_ID",
         })
-        let tagClassName = "distance-tag bg-indigo-900 rounded py-2 px-4 text-stone-50 xl:text-lg font-semibold -translate-y-4"
+        let tagClassName = "distance-tag bg-main rounded py-2 px-4 text-stone-50 xl:text-lg font-semibold -translate-y-4"
 
         let distanceTagPark = document.createElement("div")
         distanceTagPark.className = tagClassName;
@@ -257,8 +253,8 @@
             <div class="absolute w-full max-w-screen-xl mx-auto px-8 left-0 right-0 bottom-1/4 z-40">
                 <a
                     href="#formulario-contacto"
-                    class="block w-fit text-stone-50 font-semibold bg-stone-900 rounded shadow-lg shadow-stone-900 px-6 py-3 uppercase transition duration-150 hover:bg-stone-700 active:bg-stone-700 active:scale-95">
-                    Aparta con $3,500MXN
+                    class="block w-fit text-stone-50 font-semibold bg-main rounded shadow-lg shadow-stone-900 px-6 py-3 uppercase transition duration-150 hover:bg-stone-700 active:bg-stone-700 active:scale-95">
+                    ¡Aparta ya!
                 </a>
             </div>
             <button 
@@ -293,7 +289,7 @@
 <section
 	class="section grid grid-cols-3 grid-rows-[min-content] gap-y-8 gap-x-16 auto-rows-fr relative z-0 p-12 space-y-6 xl:max-w-screen-lg md:mx-auto overflow-y-hidden">
 	<h1
-		class="text-3xl font-extrabold uppercase text-center text-indigo-900 col-span-full">
+		class="text-3xl font-extrabold uppercase text-center text-secondary col-span-full">
 		Un espacio para ti y tu familia
 	</h1>
 	<div class="col-span-full space-y-2 text-stone-950 lg:col-span-1 invisible" data-char-wrapper="0">
@@ -343,7 +339,7 @@
 
 <section class="relative z-0 p-10 space-y-6">
 	<!-- TODO: Picture -->
-	<h1 class="text-center text-3xl text-indigo-900 font-extrabold uppercase">
+	<h1 class="text-center text-3xl text-secondary font-extrabold uppercase">
 		Seguridad para tu inversión
 	</h1>
 	<p class="max-w-[80ch] mx-auto">
@@ -355,7 +351,7 @@
 	</p>
 	<div class="shadow-lg shadow-stone-100 space-y-8 p-4">
 		<div class="space-y-4 px-5">
-			<h3 class="text-2xl text-center font-black uppercase">
+			<h3 class="text-2xl text-center text-main font-black uppercase">
 				Desde 96 M<sup>2</sup>
 			</h3>
 			<p class="max-w-[80ch] text-center mx-auto">
@@ -365,7 +361,7 @@
 			</p>
 		</div>
 		<div class="space-y-4 px-5">
-			<h3 class="text-2xl text-center font-black uppercase">
+			<h3 class="text-2xl text-center text-main font-black uppercase">
 				Avance de Obra
 			</h3>
 			<p class="max-w-[80ch] text-center mx-auto">
@@ -391,7 +387,7 @@
 	<div class="w-3/4 mx-auto max-w-96">
 		<a
 			href="#formulario-contacto"
-			class="block mx-auto bg-stone-50 text-blue-700 text-center rounded px-6 py-3"
+			class="block mx-auto bg-stone-50 text-indigo-800 text-center rounded px-6 py-3"
 			>Solicitar cotización</a
 		>
 	</div>
@@ -400,13 +396,13 @@
 {{template "amenities"}}
 
 <section class="relative z-0" id="seccion-ubicacion">
-    <div class="relative xl:absolute xl:-top-8 xl:right-8 z-10 bg-indigo-950 text-stone-50 py-8 px-10 xl:rounded">
-        <h1 class="text-center text-3xl font-extrabold px-10 uppercase">
+    <div class="relative xl:absolute xl:-top-8 xl:right-8 z-10 bg-main text-stone-50 py-8 px-10 xl:rounded">
+        <h1 class="text-center text-3xl text-stone-50 font-extrabold px-10 uppercase">
             Ubicados<br>
             A 25 Minutos de la Playa
         </h1>
         <div class="py-2"></div>
-        <p class="xl:w-[52ch] text-center font-light mx-auto">
+        <p class="xl:w-[52ch] text-center font-semibold mx-auto">
         ¡Vive a solo 25 minutos de la playa! Disfruta de la tranquilidad de nuestro desarrollo,
         con la comodidad de tener el mar siempre cerca. Un equilibrio perfecto entre naturaleza y confort te espera.
         </p>
@@ -489,13 +485,13 @@
             <div class="space-y-2 px-4">
                 <a
                     href="#formulario-contacto"
-                    class="block mx-auto bg-indigo-900 text-stone-50 text-center rounded px-6 py-3"
+                    class="block mx-auto bg-main text-stone-50 text-center rounded px-6 py-3"
                     >Contactanos</a
                 >
             </div>
         </div> -->
         <div
-            class="bg-indigo-900 rounded-b xl:rounded space-y-4 px-4 py-6 text-stone-50 md:max-w-lg md:-translate-x-0.5"
+            class="bg-main rounded-b xl:rounded space-y-4 px-4 py-6 text-stone-50 md:max-w-lg md:-translate-x-0.5"
             id="offc-box">
             <div class="flex items-center gap-6 pl-6 pr-4">
                 <div class="">
