@@ -1,26 +1,24 @@
 {{define "feature-slider"}}
 <script> 
-    document.addEventListener("DOMContentLoaded", function() {
-        const slider = new InfiniteSlider("#quote-features", {
-            enableAutoAnimate: true,
-            useMultiSlideView: true,
-            skipBulletBtns: true,
-            multiSlideCount: 3,
-            enableDragging: false,
-            animationSleep: 1800,
-        });
-    })
-</script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const slider = new InfiniteSlider("#quote-features", {
+                enableAutoAnimate: true,
+                useMultiSlideView: true,
+                skipBulletBtns: true,
+                multiSlideCount: 3,
+                enableDragging: false,
+                animationSleep: 1800,
+            });
+        })
+    </script>
 <style>
     [data-slider-slide] {
-        user-select:none;
+        user-select: none;
     }
 </style>
-<div id="quote-features" class="relative basis-64 grow w-full overflow-x-hidden z-0">
+<div id="quote-features" class="relative basis-[90vw] grow aspect-square overflow-x-hidden z-0">
     <div class="absolute top-1/2 left-2 -translate-y-1/2 z-10">
-        <button
-            id="quote-features-prev"
-            class="bg-stone-200/30 text-stone-50 rounded-xs p-2 rotate-180"
+        <button id="quote-features-prev" class="bg-stone-200/30 text-stone-50 rounded-xs p-2 rotate-180"
             data-slider-prev="">
             <svg class="size-6 stroke-stone-50 md:w-6 md:h-6">
                 <use href="/static/svg/arrow.svg#arrow"></use>
@@ -28,47 +26,31 @@
         </button>
     </div>
     <div class="absolute top-1/2 right-2 -translate-y-1/2 z-10">
-        <button
-            id="quote-features-next"
-            class="bg-stone-200/30 text-stone-50 rounded-xs p-2"
-            data-slider-next="">
+        <button id="quote-features-next" class="bg-stone-200/30 text-stone-50 rounded-xs p-2" data-slider-next="">
             <svg class="size-6 stroke-stone-50 md:w-6 md:h-6">
                 <use href="/static/svg/arrow.svg#arrow"></use>
             </svg>
         </button>
     </div>
     <div class="overflow-x-hidden h-full">
-        <div
-            id="quote-features-slides"
-            data-slider-slider=""
-            class="overflow-x-visible flex h-full z-0">
+        <div id="quote-features-slides" data-slider-slider="" class="overflow-x-visible flex h-full z-0">
             <div class="relative w-screen h-full basis-full shrink-0 grow-0 flex flex-col gap-4" data-slider-slide="">
-                <h2 class="basis-6 shrink-0 grow-0 text-2xl font-black text-center tracking-wide">6 x 16 m<sup>2</sup></h2>
-                <div class="basis-full shrink grow flex">
-                    <div class="text-4xl font-black m-auto"> Feature 1 </div>
-                </div>
-                <p class="basis-6 shrink-0 grow-0"></p>
+                <img 
+                    class="aspect-square object-contain overflow-hidden"
+                    src="/static/img/construye_1.png" 
+                    alt="Amenidad 1">
             </div>
             <div class="relative w-screen h-full flex-full shrink-0 grow-0 flex flex-col gap-4" data-slider-slide="">
-                <h2 class="basis-6 shrink-0 grow-0 text-2xl font-black text-center tracking-wide">Areas Verdes</h2>
-                <div class="basis-full shrink grow flex">
-                    <div class="text-4xl font-black m-auto"> Feature 2 </div>
-                </div>
-                <p class="basis-6 shrink-0 grow-0"></p>
+                <img 
+                    class="aspect-square object-contain overflow-hidden"
+                    src="/static/img/construye_2.png" 
+                    alt="Amenidad 2">
             </div>
             <div class="relative w-screen h-full flex-full shrink-0 grow-0 flex flex-col gap-4" data-slider-slide="">
-                <h2 class="basis-6 shrink-0 grow-0 text-2xl font-black text-center tracking-wide">6 x 16 m<sup>2</sup></h2>
-                <div class="basis-full shrink grow flex">
-                    <div class="text-4xl font-black m-auto"> Feature 3 </div>
-                </div>
-                <p class="basis-6 shrink-0 grow-0"></p>
-            </div>
-            <div class="relative w-screen h-full flex-full shrink-0 grow-0 flex flex-col gap-4" data-slider-slide="">
-                <h2 class="basis-6 shrink-0 grow-0 text-2xl font-black text-center tracking-wide">6 x 16 m<sup>2</sup></h2>
-                <div class="basis-full shrink grow flex">
-                    <div class="text-4xl font-black m-auto"> Feature 4 </div>
-                </div>
-                <p class="basis-6 shrink-0 grow-0"></p>
+                <img 
+                    class="aspect-square object-contain overflow-hidden"
+                    src="/static/img/construye_3.png" 
+                    alt="Amenidad 3">
             </div>
         </div>
     </div>
