@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/vladwithcode/colinas/internal/counter"
 	"github.com/vladwithcode/colinas/internal/db"
 )
 
@@ -29,6 +30,8 @@ func NewRouter() http.Handler {
 }
 
 func RenderIndex(w http.ResponseWriter, r *http.Request) {
+	counter.RegisterVisit("/")
+
 	lots, err := db.GetLots()
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
@@ -78,6 +81,8 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func RenderCampana(w http.ResponseWriter, r *http.Request) {
+	counter.RegisterVisit("/campana-fb")
+
 	templ, err := template.ParseFiles(
 		"web/templates/campana/campana.html",
 		"web/templates/campana/campana_header.html",
@@ -86,7 +91,6 @@ func RenderCampana(w http.ResponseWriter, r *http.Request) {
 		"web/templates/campana/campana_quote_calculator.html",
 		"web/templates/campana/campana_footer.html",
 	)
-
 	if err != nil {
 		fmt.Printf("err: %v\n", err)
 		w.WriteHeader(500)
