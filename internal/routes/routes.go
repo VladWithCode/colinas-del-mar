@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/vladwithcode/colinas/internal"
 	"github.com/vladwithcode/colinas/internal/counter"
 	"github.com/vladwithcode/colinas/internal/db"
 )
@@ -71,7 +72,9 @@ func RenderIndex(w http.ResponseWriter, r *http.Request) {
 			"Mz":          1,
 			"Available":   true,
 		},
-		"Lots": lotMap,
+		"Lots":              lotMap,
+		"SQMT_PRICE_CREDIT": internal.FormatMoney(db.SQMT_PRICE_CREDIT),
+		"SQMT_PRICE_CASH":   internal.FormatMoney(db.SQMT_PRICE_CASH),
 	})
 
 	if err != nil {

@@ -20,8 +20,8 @@ type Lot struct {
 	BatchId     string  `json:"batchId" db:"batch_id"`
 }
 
-const SQMT_PRICE_CASH = 1800
-const SQMT_PRICE_CREDIT = 2000
+const SQMT_PRICE_CASH = 2300
+const SQMT_PRICE_CREDIT = 2500
 
 func GetLots() ([]*Lot, error) {
 	conn, err := GetPool()

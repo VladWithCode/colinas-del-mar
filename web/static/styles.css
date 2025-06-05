@@ -94,7 +94,6 @@
     --color-main: #daa520;
     --color-main-dark: #b8860b;
     --color-secondary: #1b1b1b;
-    --color-accent: #ffd700;
   }
 }
 @layer base {
@@ -665,11 +664,11 @@
   .basis-3\/5 {
     flex-basis: calc(3/5 * 100%);
   }
-  .basis-6 {
-    flex-basis: calc(var(--spacing) * 6);
-  }
   .basis-64 {
     flex-basis: calc(var(--spacing) * 64);
+  }
+  .basis-\[90vw\] {
+    flex-basis: 90vw;
   }
   .basis-auto {
     flex-basis: auto;
@@ -955,9 +954,6 @@
   }
   .border-stone-400 {
     border-color: var(--color-stone-400);
-  }
-  .bg-accent {
-    background-color: var(--color-accent);
   }
   .bg-current {
     background-color: currentcolor;
@@ -1278,9 +1274,6 @@
   .tracking-wide {
     --tw-tracking: var(--tracking-wide);
     letter-spacing: var(--tracking-wide);
-  }
-  .text-accent {
-    color: var(--color-accent);
   }
   .text-blue-700 {
     color: var(--color-blue-700);

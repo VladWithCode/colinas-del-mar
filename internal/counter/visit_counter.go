@@ -14,7 +14,7 @@ type VisitCounter struct {
 	Visits int    `json:"visits" db:"visits"`
 }
 
-func InserOrUpdateRouteVisit(forRoute string) error {
+func InsertOrUpdateRouteVisit(forRoute string) error {
 	conn, err := db.GetPool()
 	if err != nil {
 		return err
@@ -38,7 +38,7 @@ func InserOrUpdateRouteVisit(forRoute string) error {
 
 func RegisterVisit(route string) {
 	go func() {
-		err := InserOrUpdateRouteVisit(route)
+		err := InsertOrUpdateRouteVisit(route)
 		if err != nil {
 			fpath := os.ExpandEnv("${HOME}/.local/log/colinas/error.log")
 			visitLogFile, oErr := os.OpenFile(fpath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)

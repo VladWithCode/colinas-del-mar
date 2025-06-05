@@ -97,9 +97,9 @@ func GetLotByLtMz(w http.ResponseWriter, r *http.Request) {
 		map[string]any{
 			"Lot":           lot,
 			"PriceCash":     internal.FormatMoney(lot.PriceCash),
-			"PriceMtCash":   internal.FormatMoney(lot.PriceCash / lot.Area),
+			"PriceMtCash":   internal.FormatMoney(db.SQMT_PRICE_CASH),
 			"PriceCredit":   internal.FormatMoney(lot.PriceCredit),
-			"PriceMtCredit": internal.FormatMoney(lot.PriceCredit / lot.Area),
+			"PriceMtCredit": internal.FormatMoney(db.SQMT_PRICE_CREDIT),
 		},
 	)
 

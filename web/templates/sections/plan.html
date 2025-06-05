@@ -1,6 +1,8 @@
 {{define "plan"}}
 <script>
     const LOT_DATA = {{.Lots}}
+    const SQMT_PRICE_CASH = {{.SQMT_PRICE_CASH}}
+    const SQMT_PRICE_CREDIT = {{.SQMT_PRICE_CREDIT}}
     document.addEventListener("DOMContentLoaded", () => {
         let planObject = document.getElementById("plan-object")
         let zoomInBtn = document.getElementById("plan-zoom-in")
@@ -54,7 +56,7 @@
                     tl.set("#plan-popup-spinner", { height: contentHeight+"px", width: contentWidth+"px" })
                     tl.to("#plan-popup", { autoAlpha: 1, duration: 0.1 })
                     tl.from("#plan-popup-spinner", { autoAlpha: 0, scale: 0,  borderRadius: "9999px" })
-                    
+
                     document.getElementById("plan-popup-pill").style.left = "0px"
                     let detailPillBtn = document.querySelector('[data-popup-tab-btn="detail"]')
                     document.getElementById("plan-popup-pill").style.width = detailPillBtn.scrollWidth+"px"
@@ -127,7 +129,7 @@
                 }
             }
         })
-        
+
         zoomInBtn.addEventListener("click", () => {
             pz.zoomIn()
         })
@@ -239,13 +241,13 @@
 
                 targetTabElem.style.padding = ""
                 targetPillBtn.classList.add("text-stone-50", "font-semibold")
-                tl.to(targetTabElem, { 
+                tl.to(targetTabElem, {
                     height: targetTabElem.dataset.scrollHeight+"px",
                     autoAlpha: 1,
                     duration: 0.4
                 }, "<0.1")
                 tl.to(popupPill, {
-                    left: targetPillBtn.offsetLeft+"px", 
+                    left: targetPillBtn.offsetLeft+"px",
                     width: targetPillBtn.scrollWidth+"px"
                 },"<")
 
@@ -260,16 +262,7 @@
 
             // Credit Calc
             const priceFormatter = new Intl.NumberFormat("es-MX", {style:"currency",currency:"MXN",minimumFractionDigits:2,maximumFractionDigits:2})
-            const DEFAULT_PRICE = 192_000
-            const PRICE_BY_TIME = {
-                "3": 192_000,
-                "6": 192_000,
-                "12": 192_000,
-                "18": 192_000,
-                "24": 192_000,
-                "32": 192_000,
-                "48": 192_000,
-            }
+            const DEFAULT_PRICE = 240_000
             const MIN_CRED_DEPOSIT = 24_000
             let creditPriceElem = document.getElementById("credit-current-total")
             let creditDepositInp = document.getElementById("credit-deposit")
@@ -278,7 +271,7 @@
             let creditInstallmentElem = document.getElementById("credit-installment")
 
             let currentCreditTime = Number(creditTimeSelect.value)
-            let currentTotal = PRICE_BY_TIME[currentCreditTime] || DEFAULT_PRICE
+            let currentTotal = DEFAULT_PRICE
             creditPriceElem.dataset.creditTotal = currentTotal
 
             let remainingBalance = currentTotal - Number(creditDepositInp.value)
@@ -295,13 +288,13 @@
                 }
 
                 let credTime = creditTimeSelect.value
-                let credTotal = PRICE_BY_TIME[credTime] || DEFAULT_PRICE
+                let credTotal = DEFAULT_PRICE
                 creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, val, credTime)
                 renderCreditChange()
             })
             creditTimeSelect.addEventListener("change", e => {
                 let val = e.target.value
-                let credTotal = PRICE_BY_TIME[val] || DEFAULT_PRICE
+                let credTotal = DEFAULT_PRICE
                 let credDeposit = creditDepositInp.value
                 creditPriceElem.dataset.creditTotal = credTotal
                 creditInstallmentElem.dataset.creditInstallment = calcCreditInstallment(credTotal, credDeposit, val)
@@ -346,8 +339,8 @@
 <section class="z-0 flex flex-col max-w-full  overflow-hidden" id="seccion-plano">
     <h1 class="text-center text-3xl text-secondary font-extrabold uppercase mb-4 lg:mb-8">Plano de disponibilidad</h1>
     <!-- Popup -->
-    <div 
-        class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6 invisible" 
+    <div
+        class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6 invisible"
         id="plan-popup">
         <!-- Spinner -->
         <div class="flex flex-col items-center justify-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-100 z-20 bg-stone-50 rounded invisible" id="plan-popup-spinner">
@@ -355,14 +348,14 @@
             <p class="text-xl text-stone-500 font-semibold">Cargando...</p>
         </div>
         <!-- Error -->
-        <div 
+        <div
             class="absolute flex flex-col items-center justify-center gap-4 w-96 max-w-[80%] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-stone-50 rounded invisible m-auto px-8 py-4"
             id="plan-popup-error">
             <svg class="w-32 h-32">
                 <use href="/static/svg/fail.svg#fail"></use>
             </svg>
             <p class="text-stone-700 font-semibold text-xl">Ocurrio un error al recuperar el lote</p>
-            <button 
+            <button
                 class="w-full bg-red-600 py-2 text-stone-50 font-medium rounded"
                 id="plan-popup-error-close">Cerrar</button>
         </div>
@@ -398,7 +391,7 @@
 
 {{define "popup-content"}}
 {{with .Lot}}
-<div 
+<div
     class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden z-10"
     style="height: 0px"
     id="plan-popup-content">
@@ -406,17 +399,17 @@
     <div class="flex justify-between gap-2 shrink grow-0 border-b-2 border-stone-200">
         <div class="overflow-x-auto p-2">
             <div class="relative flex gap-2 text-sm z-0 basis-full grow text-stone-700 ">
-                <p 
+                <p
                 class="absolute top-0 left-0 rounded px-2 py-1.5 bg-slate-700 text-transparent outline outline-2 outline-indigo-600 uppercase -z-10"
                 id="plan-popup-pill">&nbsp;</p>
                 <button
                     class="text-stone-50 px-2 py-1.5 font-semibold rounded uppercase"
                     data-popup-tab-btn="detail"
                     data-popup-tab-btn-active>detalles</button>
-                <button 
+                <button
                     class="px-2 py-1.5 rounded uppercase"
                     data-popup-tab-btn="calc">calculadora</button>
-                <button 
+                <button
                     class="px-2 py-1.5 rounded uppercase"
                     data-popup-tab-btn="form">contacto</button>
             </div>
@@ -469,14 +462,14 @@
                 </ul>
                 <div class="py-4"></div>
                 <div class="relative flex flex-col space-y-2 bottom-0" id="popup-cta-wrapper">
-                    <button 
+                    <button
                         class="bg-orange-500 py-2 text-stone-50 font-medium rounded{{if not .Available}} hidden{{end}}"
                         id="popup-contact-now-btn"
                         data-popup-tab-cta="form"
                         {{if not .Available}}disabled{{end}}>Contactácnos ahora</button>
                     <button
                         class="bg-indigo-900 py-2 text-stone-50 font-medium rounded{{if not .Available}} hidden{{end}}"
-                        id="popup-calc-credit-btn" 
+                        id="popup-calc-credit-btn"
                         data-popup-tab-cta="calc"
                         {{if not .Available}}disabled{{end}}>Cotiza tu Financiamiento</button>
                     <button
@@ -499,7 +492,7 @@
                     <p class="text-2xl font-bold text-indigo-900 mt-auto">{{$.PriceCash}}</p>
                 </div>
                 <div class="basis-1/2 flex-1">
-                    <p class="text-sm text-stone-900 font-semibold">Precio <br>Financiado</p>
+                    <p class="text-sm text-stone-900 font-semibold">Precio<br>Financiado</p>
                     <p class="text-2xl font-bold text-indigo-900 mt-auto" id="credit-current-total" data-credit-total="{{.PriceCredit}}">{{$.PriceCredit}}</p>
                 </div>
             </div>
@@ -507,7 +500,7 @@
             <div class="flex gap-2">
                 <div class="flex-1 basis-1/2 space-y-1">
                     <p class="text-sm text-stone-900 font-semibold">Enganche</p>
-                    <input 
+                    <input
                     class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
                     type="number"
                     name="deposit"
@@ -519,9 +512,9 @@
                 </div>
                 <div class="flex-1 basis-1/2 space-y-1">
                     <p class="text-sm text-stone-900 font-semibold">Plazo</p>
-                    <select 
+                    <select
                         class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
-                        name="time" 
+                        name="time"
                         id="credit-time">
                         <option value="3">3 meses</option>
                         <option value="6">6 meses</option>
@@ -529,7 +522,8 @@
                         <option value="18">18 meses</option>
                         <option value="24">24 meses</option>
                         <option value="32">32 meses</option>
-                        <option value="48" selected>48 meses</option>
+                        <option value="44">44 meses</option>
+                        <option value="60" selected>60 meses</option>
                     </select>
                 </div>
             </div>
@@ -537,16 +531,16 @@
             <div class="flex gap-2">
                 <div class="grow-0 basis-1/2 pl-1">
                     <p class="text-stone-900 font-bold">Precio/m<sup>2</sup></p>
-                    <p class="text-2xl font-bold text-indigo-900" id="credit-sqmt-price">$2,000.00</p>
+                    <p class="text-2xl font-bold text-indigo-900" id="credit-sqmt-price">{{$.PriceMtCredit}}</p>
                 </div>
                 <div class="grow-0 basis-1/2 pl-1">
                     <p class="text-stone-900 font-bold">Mensualidad</p>
-                    <p class="text-2xl font-bold text-indigo-900" id="credit-installment" data-credit-installment="2_587">$2,587.00</p>
+                    <p class="text-2xl font-bold text-indigo-900" id="credit-installment" data-credit-installment="3_600">$3,600.00</p>
                 </div>
-            </div> 
+            </div>
             <div class="py-2"></div>
             <div class="flex">
-                <button 
+                <button
                     type="button"
                     role="button"
                     class="bg-orange-500 text-stone-50 font-medium w-full py-2 rounded"
@@ -559,7 +553,7 @@
     </div>
 </div>
 {{else}}
-<div 
+<div
     class="flex flex-col w-full xl:max-w-screen-lg mx-auto bg-stone-50 rounded overflow-hidden"
     style="height: 0px"
     id="plan-popup-content">
@@ -598,7 +592,7 @@
         <div class="flex-1 basis-1/2">
             <label for="popup-contact-name" class="block text-stone-900 font-medium">Nombre</label>
             <div class="py-px"></div>
-            <input 
+            <input
             class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
             type="text"
             name="name"
@@ -612,7 +606,7 @@
         <div class="flex-1 basis-1/2">
             <label for="popup-contact-name" class="block text-stone-900 font-medium">Teléfono</label>
             <div class="py-px"></div>
-            <input 
+            <input
             class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
             type="tel"
             name="phone"
@@ -626,7 +620,7 @@
         <div class="flex-1 basis-1/2">
             <label for="popup-payment-type" class="block text-stone-900 font-medium">Me interesa el pago:</label>
             <div class="py-px"></div>
-            <select 
+            <select
                 class="w-full border border-stone-300 rounded px-2 py-1 outline-indigo-900"
                 name="paymentType"
                 id="popup-payment-type">
@@ -642,7 +636,7 @@
     </div>
     <div class="py-2"></div>
     <div class="flex">
-        <button 
+        <button
             class="bg-orange-500 text-stone-50 font-medium w-full py-2 rounded uppercase"
             type="submit"
             id="popup-contact-submit">Enviar</button>
