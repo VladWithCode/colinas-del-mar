@@ -7,15 +7,15 @@
         let planObject = document.getElementById("plan-object")
         let zoomInBtn = document.getElementById("plan-zoom-in")
         let zoomOutBtn = document.getElementById("plan-zoom-out")
-        let pz = Panzoom(planObject, {
+        /* let pz = Panzoom(planObject, {
             maxScale: 6,
             minScale: 1,
             animate: true,
-        })
+        }) */
         planObject.addEventListener("load", () => {
             let planDoc = planObject.contentDocument
             let lotWrapper = planDoc.getElementById("mzt-plan-svg")
-            let lots = planDoc.querySelectorAll("[data-lot-svg]")
+            let lots = planDoc.querySelectorAll(".lots")
             let planRect = planObject.getClientRects()[0]
             let planCenter = [
                 planRect.width * .5,
@@ -33,7 +33,6 @@
 
                 if (!lotData || !lotData.available) {
                     lot.style.fill = "rgb(190,37,37)"
-                    lot.style.stroke = "rgb(190,37,37)"
                 }
 
                 lot.addEventListener("mouseover", e => {
@@ -130,15 +129,15 @@
             }
         })
 
-        zoomInBtn.addEventListener("click", () => {
-            pz.zoomIn()
-        })
-        zoomOutBtn.addEventListener("click", () => {
-            pz.zoomOut()
-            if (pz.getScale() === 1) {
-                pz.reset()
-            }
-        })
+        //zoomInBtn.addEventListener("click", () => {
+        //    pz.zoomIn()
+        //})
+        //zoomOutBtn.addEventListener("click", () => {
+        //    pz.zoomOut()
+        //    if (pz.getScale() === 1) {
+        //        pz.reset()
+        //    }
+        //})
 
         let planPopup = document.getElementById("plan-popup")
         planPopup.addEventListener("click", e => {
@@ -337,7 +336,7 @@
     })
 </script>
 <section class="z-0 flex flex-col max-w-full  overflow-hidden" id="seccion-plano">
-    <h1 class="text-center text-3xl text-secondary font-extrabold uppercase mb-4 lg:mb-8">Plano de disponibilidad</h1>
+    <h1 class="text-center text-3xl text-secondary font-extrabold uppercase">Plano de disponibilidad</h1>
     <!-- Popup -->
     <div
         class="fixed flex items-center inset-0 w-full z-40 bg-stone-900 bg-opacity-75 px-4 py-6 invisible"
@@ -361,29 +360,50 @@
         </div>
         {{template "popup-content" .}}
     </div>
-    {{template "green-area-popup" .}}
+    {{/* template "green-area-popup" . */}}
     <div class="w-full flex-auto px-4">
-        <!-- Plan -->
-        <div class="relative w-full max-w-screen-xl mx-auto z-0 rounded overflow-hidden">
-            <object
+        <!-- New Plan -->
+        <div class="relative w-full max-w-screen-xl h-[95vh] aspect-square mx-auto z-0 rounded overflow-hidden">
+            <img 
+                width="1800"
+                height="1800"
+                src="/static/plan/plan_bg.jpg"
+                alt="Imagen de fondo para el plano interactivo."
+                class="absolute inset-0 w-full h-full object-contain z-0">
+            <object 
                 id="plan-object"
-                data="/static/svg/plan-new.svg"
+                data="/static/plan/plan_interactive.svg"
                 type="image/svg+xml"
-                class="w-full max-h-[80vh] object-center">
+                class="absolute inset-0 w-auto h-full object-center mx-auto z-10">
             </object>
-            <div class="absolute bottom-2 right-2">
-                <button class="h-8 w-8 flex items-center justify-center rounded-t bg-stone-200" id="plan-zoom-in">
-                    <svg class="w-4 h-4 fill-stone-400 rotate-45">
-                        <use href="/static/svg/times.svg#times"></use>
-                    </svg>
-                </button>
-                <button class="h-8 w-8 flex items-center justify-center rounded-b bg-stone-200" id="plan-zoom-out">
-                    <svg class="w-8 h-8 stroke-stone-400">
-                        <use href="/static/svg/minus.svg#minus"></use>
-                    </svg>
-                </button>
-            </div>
+            <img 
+                width="1800"
+                height="1800"
+                src="/static/plan/plan_labels.png" 
+                alt="Indicadores de numero de manzana para el plano interactivo."
+                class="absolute w-full h-full pointer-events-none object-contain inset-0 z-20">
         </div>
+        <!-- Plan -->
+        <!--<div class="relative w-full max-w-screen-xl mx-auto z-0 rounded overflow-hidden">-->
+        <!--    <object-->
+        <!--        id="plan-object"-->
+        <!--        data="/static/svg/plan-new.svg"-->
+        <!--        type="image/svg+xml"-->
+        <!--        class="w-full max-h-[80vh] object-center">-->
+        <!--    </object>-->
+        <!--    <div class="absolute bottom-2 right-2">-->
+        <!--        <button class="h-8 w-8 flex items-center justify-center rounded-t bg-stone-200" id="plan-zoom-in">-->
+        <!--            <svg class="w-4 h-4 fill-stone-400 rotate-45">-->
+        <!--                <use href="/static/svg/times.svg#times"></use>-->
+        <!--            </svg>-->
+        <!--        </button>-->
+        <!--        <button class="h-8 w-8 flex items-center justify-center rounded-b bg-stone-200" id="plan-zoom-out">-->
+        <!--            <svg class="w-8 h-8 stroke-stone-400">-->
+        <!--                <use href="/static/svg/minus.svg#minus"></use>-->
+        <!--            </svg>-->
+        <!--        </button>-->
+        <!--    </div>-->
+        <!--</div>-->
 
     </div>
 </section>

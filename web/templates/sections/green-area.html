@@ -5,7 +5,7 @@
             let planObject = document.getElementById("plan-object")
             planObject.addEventListener("load", () => {
                 let planDoc = planObject.contentDocument
-                let greenAreaSvg = planDoc.querySelector("[data-green-area-svg]")
+                let greenAreaSvg = planDoc.querySelector(".greens")
                 let closeGreenAreaPopupBtn = document.getElementById("green-area-close-btn")
 
                 greenAreaSvg.addEventListener("click", (e) => {
