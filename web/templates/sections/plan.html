@@ -7,11 +7,6 @@
         let planObject = document.getElementById("plan-object")
         let zoomInBtn = document.getElementById("plan-zoom-in")
         let zoomOutBtn = document.getElementById("plan-zoom-out")
-        /* let pz = Panzoom(planObject, {
-            maxScale: 6,
-            minScale: 1,
-            animate: true,
-        }) */
         planObject.addEventListener("load", () => {
             let planDoc = planObject.contentDocument
             let lotWrapper = planDoc.getElementById("mzt-plan-svg")
@@ -83,13 +78,6 @@
                 })
 
             }
-            planObject.addEventListener("panzoomreset", () => {
-                for (lot of lots) {
-                    lot.classList.remove("active-lot")
-                    lot.style.display = "block"
-                }
-                planDoc.getElementById("plan-sat").style.opacity = 1
-            })
 
             // Resets active tab to 'detail'
             function resetActiveTab() {
@@ -117,16 +105,6 @@
                 }
             }
         })
-
-        //zoomInBtn.addEventListener("click", () => {
-        //    pz.zoomIn()
-        //})
-        //zoomOutBtn.addEventListener("click", () => {
-        //    pz.zoomOut()
-        //    if (pz.getScale() === 1) {
-        //        pz.reset()
-        //    }
-        //})
 
         let planPopup = document.getElementById("plan-popup")
         planPopup.addEventListener("click", e => {
