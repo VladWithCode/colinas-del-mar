@@ -32,19 +32,8 @@
                 let lotData = LOT_DATA[dataId]
 
                 if (!lotData || !lotData.available) {
-                    lot.style.fill = "rgb(190,37,37)"
+                    lot.classList.add("unavailable")
                 }
-
-                lot.addEventListener("mouseover", e => {
-                    // New svgs separated fill and stroke into different paths
-                    // irregularly
-                    lot.parentElement.appendChild(lot)
-
-                    let activeLot = planDoc.querySelector(".active-lot")
-                    if (activeLot) {
-                        activeLot.parentElement.appendChild(activeLot)
-                    }
-                })
                 lot.addEventListener("click", async e => {
                     e.stopPropagation()
                     resetActiveTab()
@@ -361,27 +350,56 @@
         {{template "popup-content" .}}
     </div>
     {{/* template "green-area-popup" . */}}
-    <div class="w-full flex-auto px-4">
+    <div class="w-full flex-auto">
         <!-- New Plan -->
-        <div class="relative w-full max-w-screen-xl h-[95vh] aspect-square mx-auto z-0 rounded overflow-hidden">
-            <img 
-                width="1800"
-                height="1800"
-                src="/static/plan/plan_bg.jpg"
-                alt="Imagen de fondo para el plano interactivo."
-                class="absolute inset-0 w-full h-full object-contain z-0">
-            <object 
-                id="plan-object"
-                data="/static/plan/plan_interactive.svg"
-                type="image/svg+xml"
-                class="absolute inset-0 w-auto max-w-full h-full object-center mx-auto z-10">
-            </object>
-            <img 
-                width="1800"
-                height="1800"
-                src="/static/plan/plan_labels.png" 
-                alt="Indicadores de numero de manzana para el plano interactivo."
-                class="absolute w-full h-full pointer-events-none object-contain inset-0 z-20">
+        <div class="relative w-full max-w-screen-xl mx-auto z-0 rounded overflow-hidden">
+            <div class="grid grid-cols-1 grid-rows-1 relative inset-0 ml-2">
+                <!-- <style id="plan_styles">
+                    .outline {
+                        stroke: #231f20;
+                        fill: none;
+                    }
+                    .greens {
+                        fill: #99cc67;
+                    }
+                    .lots {
+                        fill: #4167b0;
+                    }
+                    .greens:hover,
+                    .lots:hover {
+                        fill: #4a8923;
+                        cursor: pointer;
+                    }
+                    .lots:active,
+                    .greens:active {
+                        cursor: pointer;
+                        fill: #7ed747;
+                    }
+                    .unavailable {
+                        fill: #be2525
+                    }
+                </style> -->
+                <img 
+                    width="1520"
+                    height="1520"
+                    src="/static/plan/plan_bg.jpg"
+                    alt="Imagen de fondo para el plano interactivo."
+                    class="row-start-1 col-start-1 relative w-full h-full object-contain z-0">
+                <object 
+                    width="1520"
+                    height="1520"
+                    id="plan-object"
+                    data="/static/plan/plan_interactive.svg"
+                    type="image/svg+xml"
+                    class="row-start-1 col-start-1 relative w-auto max-w-full h-full object-center mx-auto z-10">
+                </object>
+                <img 
+                    width="1520"
+                    height="1520"
+                    src="/static/plan/plan_labels.png" 
+                    alt="Indicadores de numero de manzana para el plano interactivo."
+                    class="row-start-1 col-start-1 relative w-full h-full pointer-events-none object-contain z-20">
+            </div>
         </div>
         <!-- Plan -->
         <!--<div class="relative w-full max-w-screen-xl mx-auto z-0 rounded overflow-hidden">-->
